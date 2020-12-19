@@ -20,10 +20,18 @@
 </template>
 
 <script>
+import { useStore } from 'vuex'
+
 export default {
-  methods: {
-    logout() {
-      this.$store.dispatch('logout')
+  setup() {
+    const store = useStore()
+
+    function logout() {
+      store.dispatch('logout')
+    }
+
+    return {
+      logout
     }
   }
 }

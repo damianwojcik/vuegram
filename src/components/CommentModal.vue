@@ -12,30 +12,38 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
 import { commentsCollection, postsCollection, auth } from '@/firebase'
 
 export default {
-  props: ['post'],
-  data() {
-    return {
-      comment: ''
-    }
+  props: {
+    post: Object
   },
-  methods: {
-    async addComment() {
+  setup(props, { emit }) {
+    const store = useStore()
+    const comment = ref('')
+    const userName = computed(() => store.state.userProfile.name).value
+
+    async function addComment() {
       await commentsCollection.add({
         createdOn: new Date(),
-        content: this.comment,
-        postId: this.post.id,
+        content: comment.value,
+        postId: props.post.id,
         userId: auth.currentUser.uid,
-        userName: this.$store.state.userProfile.name
+        userName: userName
       })
 
-      await postsCollection.doc(this.post.id).update({
-        comments: parseInt(this.post.comments) + 1
+      await postsCollection.doc(props.post.id).update({
+        comments: parseInt(props.post.comments) + 1
       })
 
-      this.$emit('close')
+      emit('close')
+    }
+
+    return {
+      comment,
+      addComment
     }
   }
 }

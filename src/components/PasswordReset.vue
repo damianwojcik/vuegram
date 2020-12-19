@@ -21,25 +21,30 @@
 </template>
 
 <script>
+import { ref } from 'vue'
 import { auth } from '@/firebase'
 
 export default {
-  data() {
-    return {
-      email: '',
-      showSuccess: false,
-      errorMsg: ''
-    }
-  },
-  methods: {
-    async resetPassword() {
-      this.errorMsg = ''
+  setup() {
+    const email = ref('')
+    const showSuccess = ref(false)
+    const errorMsg = ref('')
+
+    async function resetPassword() {
+      errorMsg.value = ''
       try {
         await auth.sendPasswordResetEmail(this.email)
-        this.showSuccess = true
+        showSuccess.value = true
       } catch (err) {
-        this.errorMsg = err.message
+        errorMsg.value = err.message
       }
+    }
+
+    return {
+      email,
+      showSuccess,
+      errorMsg,
+      resetPassword
     }
   }
 }
