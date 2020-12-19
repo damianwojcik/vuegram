@@ -91,48 +91,54 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { useStore } from 'vuex'
 import PasswordReset from '@/components/PasswordReset'
 
 export default {
   components: {
     PasswordReset
   },
-  data() {
-    return {
-      loginForm: {
-        email: '',
-        password: ''
-      },
-      signupForm: {
-        name: '',
-        title: '',
-        email: '',
-        password: ''
-      },
-      showLoginForm: true,
-      showPasswordReset: false
+  setup() {
+    const store = useStore()
+    const loginForm = ref({ email: '', password: '' })
+    const signupForm = ref({ name: '', title: '', email: '', password: '' })
+    const showLoginForm = ref(true)
+    const showPasswordReset = ref(false)
+
+    function toggleForm() {
+      showLoginForm.value = !showLoginForm.value
     }
-  },
-  methods: {
-    toggleForm() {
-      this.showLoginForm = !this.showLoginForm
-    },
-    togglePasswordReset() {
-      this.showPasswordReset = !this.showPasswordReset
-    },
-    login() {
-      this.$store.dispatch('login', {
-        email: this.loginForm.email,
-        password: this.loginForm.password
+
+    function togglePasswordReset() {
+      showPasswordReset.value = !showPasswordReset.value
+    }
+
+    function login() {
+      store.dispatch('login', {
+        email: loginForm.value.email,
+        password: loginForm.value.password
       })
-    },
-    signup() {
-      this.$store.dispatch('signup', {
-        email: this.signupForm.email,
-        password: this.signupForm.password,
-        name: this.signupForm.name,
-        title: this.signupForm.title
+    }
+
+    function signup() {
+      store.dispatch('signup', {
+        email: signupForm.value.email,
+        password: signupForm.value.password,
+        name: signupForm.value.name,
+        title: signupForm.value.title
       })
+    }
+
+    return {
+      loginForm,
+      signupForm,
+      showLoginForm,
+      showPasswordReset,
+      toggleForm,
+      togglePasswordReset,
+      login,
+      signup
     }
   }
 }

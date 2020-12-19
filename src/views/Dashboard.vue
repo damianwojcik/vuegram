@@ -89,8 +89,9 @@
   </div>
 </template>
 <script>
+import { ref, computed } from 'vue'
 import { commentsCollection } from '@/firebase'
-import { mapState } from 'vuex'
+import { useStore } from 'vuex'
 import moment from 'moment'
 import CommentModal from '@/components/CommentModal'
 
@@ -98,67 +99,86 @@ export default {
   components: {
     CommentModal
   },
-  data() {
-    return {
-      post: {
-        content: ''
-      },
-      showCommentModal: false,
-      selectedPost: {},
-      showPostModal: false,
-      fullPost: {},
-      postComments: []
+  setup() {
+    const store = useStore()
+    const userProfile = computed(() => store.state.userProfile)
+    const posts = computed(() => store.state.posts)
+    const post = ref({ content: '' })
+    const selectedPost = ref({})
+    const fullPost = ref({})
+    const postComments = ref([])
+    const showCommentModal = ref(false)
+    const showPostModal = ref(false)
+
+    function createPost() {
+      store.dispatch('createPost', { content: post.value.content })
+      post.value.content = ''
     }
-  },
-  computed: {
-    ...mapState(['userProfile', 'posts'])
-  },
-  methods: {
-    createPost() {
-      this.$store.dispatch('createPost', { content: this.post.content })
-      this.post.content = ''
-    },
-    formatDate(val) {
+
+    function formatDate(val) {
       if (!val) {
         return '-'
       }
 
       let date = val.toDate()
       return moment(date).fromNow()
-    },
-    trimmContent(val) {
+    }
+
+    function trimmContent(val) {
       if (val.length < 200) {
         return val
       }
       return `${val.substring(0, 200)}...`
-    },
-    toggleCommentModal(post) {
-      this.showCommentModal = !this.showCommentModal
+    }
 
-      if (this.showCommentModal) {
-        this.selectedPost = post
+    function toggleCommentModal(post) {
+      showCommentModal.value = !showCommentModal.value
+
+      if (showCommentModal.value) {
+        selectedPost.value = post
       } else {
-        this.selectedPost = {}
+        selectedPost.value = {}
       }
-    },
-    likePost(id, likesCount) {
-      this.$store.dispatch('likePost', { id, likesCount })
-    },
-    async viewPost(post) {
+    }
+
+    function likePost(id, likesCount) {
+      store.dispatch('likePost', { id, likesCount })
+    }
+
+    async function viewPost(post) {
       const docs = await commentsCollection.where('postId', '==', post.id).get()
 
       docs.forEach((doc) => {
         let comment = doc.data()
         comment.id = doc.id
-        this.postComments.push(comment)
+        postComments.value.push(comment)
       })
 
-      this.fullPost = post
-      this.showPostModal = true
-    },
-    closePostModal() {
-      this.postComments = []
-      this.showPostModal = false
+      fullPost.value = post
+      showPostModal.value = true
+    }
+
+    function closePostModal() {
+      postComments.value = []
+      showPostModal.value = false
+    }
+
+    return {
+      userProfile,
+      posts,
+      createPost,
+      formatDate,
+      trimmContent,
+      toggleCommentModal,
+      likePost,
+      viewPost,
+      closePostModal,
+      post,
+      selectedPost,
+      fullPost,
+      postComments,
+      showCommentModal,
+      showPostModal
     }
   }
 }

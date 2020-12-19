@@ -32,34 +32,39 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
-  data() {
-    return {
-      name: '',
-      title: '',
-      showSuccess: false
-    }
-  },
-  computed: {
-    ...mapState(['userProfile'])
-  },
-  methods: {
-    updateProfile() {
-      this.$store.dispatch('updateProfile', {
-        name: this.name !== '' ? this.name : this.userProfile.name,
-        title: this.title !== '' ? this.title : this.userProfile.title
+  setup() {
+    const store = useStore()
+    const userProfile = computed(() => store.state.userProfile)
+    const name = ref('')
+    const title = ref('')
+    const showSuccess = ref(false)
+
+    function updateProfile() {
+      store.dispatch('updateProfile', {
+        name: name.value !== '' ? name.value : userProfile.value.name,
+        title: title.value !== '' ? title.value : userProfile.value.title
       })
 
-      this.name = ''
-      this.title = ''
+      name.value = ''
+      title.value = ''
 
-      this.showSuccess = true
+      showSuccess.value = true
 
       setTimeout(() => {
-        this.showSuccess = false
+        showSuccess.value = false
       }, 2000)
+    }
+
+    return {
+      userProfile,
+      name,
+      title,
+      showSuccess,
+      updateProfile
     }
   }
 }
