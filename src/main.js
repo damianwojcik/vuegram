@@ -5,8 +5,11 @@ import store from './store'
 import { auth } from './firebase'
 import './assets/scss/app.scss'
 
+let app
 auth.onAuthStateChanged((user) => {
-  createApp(App).use(store).use(router).mount('#app')
+  if(!app) {
+    app = createApp(App).use(store).use(router).mount('#app')
+  }
 
   if(user) {
     store.dispatch('fetchUserProfile', user)

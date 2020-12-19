@@ -36,7 +36,7 @@ const store = createStore({
     async fetchUserProfile({ commit }, user) {
       const userProfile = await fb.usersCollection.doc(user.uid).get()
       commit('setUserProfile', userProfile.data())
-      if (router.currentRoute.path === '/login') {
+      if (router.currentRoute.value.path === '/login') {
         router.push('/')
       }
     },
