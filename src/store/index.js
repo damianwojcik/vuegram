@@ -82,6 +82,29 @@ const store = createStore({
       fb.postsCollection.doc(post.id).update({
         likes: post.likesCount + 1
       })
+    },
+    async updateProfile({ dispatch }, user) {
+      const userId = fb.auth.currentUser.uid
+      await fb.usersCollection.doc(userId).update({
+        name: user.name,
+        title: user.title
+      })
+    
+      dispatch('fetchUserProfile', { uid: userId })
+    
+      const postDocs = await fb.postsCollection.where('userId', '==', userId).get()
+      postDocs.forEach(doc => {
+        fb.postsCollection.doc(doc.id).update({
+          userName: user.name
+        })
+      })
+    
+      const commentDocs = await fb.commentsCollection.where('userId', '==', userId).get()
+      commentDocs.forEach(doc => {
+        fb.commentsCollection.doc(doc.id).update({
+          userName: user.name
+        })
+      })
     }
   },
   modules: {
