@@ -12,7 +12,10 @@ auth.onAuthStateChanged((user) => {
   }
 
   if(user) {
+    localStorage.setItem('user', user.uid)
     store.dispatch('fetchUserProfile', user)
+  } else {
+    localStorage.removeItem('user')
   }
 })
 

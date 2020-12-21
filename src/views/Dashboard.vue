@@ -1,11 +1,14 @@
 <template>
   <div id="dashboard">
     <transition name="fade">
-      <CommentModal
-        v-if="showCommentModal"
+      <FullPost
+        v-if="showPostModal"
         :post="selectedPost"
-        @close="toggleCommentModal()"
-      ></CommentModal>
+        :formatDate="formatDate"
+        :likePost="likePost"
+        :postComments="postComments"
+        @close="togglePostModal()"
+      ></FullPost>
     </transition>
     <section>
       <div class="col1">
@@ -21,7 +24,7 @@
                 :disabled="post.content === ''"
                 class="button"
               >
-                post
+                Post
               </button>
             </form>
           </div>
@@ -35,17 +38,46 @@
             <p>{{ trimmContent(post.content) }}</p>
             <ul>
               <li>
+                <a @click="likePost(post.id)">
+                  <span
+                    v-bind:class="[
+                      post.likes.includes(userProfile.id) ? 'liked' : ''
+                    ]"
+                    >❤</span
+                  >
+                </a>
+              </li>
+              <li>
+                <span v-if="post.likes.length === 0">
+                  {{ post.likes.length }} likes</span
+                >
+                <a v-else @click="toggleLikesModal(post.id, post.likes)">
+                  {{ post.likes.length }} likes
+                </a>
+                <div v-if="showLikesModal === post.id" class="likesModal">
+                  <a @click="closeLikesModal()" class="close">&times;</a>
+                  <h5>Likes:</h5>
+                  <ul>
+                    <li v-for="user in likesUsers" :key="user.id">
+                      {{ user.name }}
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
                 <a @click="toggleCommentModal(post)"
                   >comments {{ post.comments }}</a
                 >
               </li>
-              <li>
-                <a @click="likePost(post.id, post.likes)"
-                  >likes {{ post.likes }}</a
-                >
-              </li>
-              <li><a @click="viewPost(post)">view full post</a></li>
+              <li><a @click="togglePostModal(post)">view full post</a></li>
             </ul>
+            <transition name="fade">
+              <CommentModal
+                v-if="showCommentModal && post.id === selectedPost.id"
+                :post="selectedPost"
+                @close="toggleCommentModal()"
+              ></CommentModal>
+            </transition>
           </div>
         </div>
         <div v-else>
@@ -53,51 +85,20 @@
         </div>
       </div>
     </section>
-
-    <!-- full post modal -->
-    <transition name="fade">
-      <div v-if="showPostModal" class="p-modal">
-        <div class="p-container">
-          <a @click="closePostModal()" class="close">close</a>
-          <div class="post">
-            <h5>{{ fullPost.userName }}</h5>
-            <span>{{ formatDate(fullPost.createdOn) }}</span>
-            <p>{{ fullPost.content }}</p>
-            <ul>
-              <li>
-                <a>comments {{ fullPost.comments }}</a>
-              </li>
-              <li>
-                <a>likes {{ fullPost.likes }}</a>
-              </li>
-            </ul>
-          </div>
-          <div v-show="postComments.length" class="comments">
-            <div
-              v-for="comment in postComments"
-              :key="comment.id"
-              class="comment"
-            >
-              <p>{{ comment.userName }}</p>
-              <span>{{ formatDate(comment.createdOn) }}</span>
-              <p>{{ comment.content }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 <script>
 import { ref, computed } from 'vue'
-import { commentsCollection } from '@/firebase'
+import { usersCollection, commentsCollection } from '@/firebase'
 import { useStore } from 'vuex'
 import moment from 'moment'
 import CommentModal from '@/components/CommentModal'
+import FullPost from '@/components/FullPost'
 
 export default {
   components: {
-    CommentModal
+    CommentModal,
+    FullPost
   },
   setup() {
     const store = useStore()
@@ -105,10 +106,11 @@ export default {
     const posts = computed(() => store.state.posts)
     const post = ref({ content: '' })
     const selectedPost = ref({})
-    const fullPost = ref({})
     const postComments = ref([])
+    const likesUsers = ref([])
     const showCommentModal = ref(false)
     const showPostModal = ref(false)
+    const showLikesModal = ref('')
 
     function createPost() {
       store.dispatch('createPost', { content: post.value.content })
@@ -141,26 +143,63 @@ export default {
       }
     }
 
-    function likePost(id, likesCount) {
-      store.dispatch('likePost', { id, likesCount })
+    function toggleLikesModal(postId, likes) {
+      showLikesModal.value = postId
+
+      likes.forEach(async (like) => {
+        const doc = await usersCollection.doc(like).get()
+        const user = { id: like, ...doc.data() }
+        likesUsers.value.unshift(user)
+      })
     }
 
-    async function viewPost(post) {
-      const docs = await commentsCollection.where('postId', '==', post.id).get()
+    function likePost(postId) {
+      const userId = userProfile.value.id
+      store.dispatch('likePost', postId)
 
-      docs.forEach((doc) => {
-        let comment = doc.data()
-        comment.id = doc.id
-        postComments.value.push(comment)
-      })
+      if (Object.keys(selectedPost.value).length > 0) {
+        const likesArr = Object.values(selectedPost.value.likes)
+        if (likesArr.includes(userId)) {
+          const filteredLikesArr = likesArr.filter((val) => val !== userId)
+          selectedPost.value.likes = filteredLikesArr
+        } else {
+          likesArr.push(userId)
+          selectedPost.value.likes = likesArr
+        }
+      }
+    }
 
-      fullPost.value = post
-      showPostModal.value = true
+    async function togglePostModal(post) {
+      showPostModal.value = !showPostModal.value
+
+      if (post) {
+        if (showPostModal.value) {
+          selectedPost.value = post
+        } else {
+          selectedPost.value = {}
+        }
+
+        const docs = await commentsCollection
+          .where('postId', '==', post.id)
+          .get()
+
+        docs.forEach((doc) => {
+          let comment = doc.data()
+          comment.id = doc.id
+          postComments.value.push(comment)
+        })
+      }
     }
 
     function closePostModal() {
-      postComments.value = []
       showPostModal.value = false
+      selectedPost.value = {}
+      postComments.value = []
+    }
+
+    function closeLikesModal() {
+      showLikesModal.value = ''
+      likesUsers.value = []
     }
 
     return {
@@ -170,16 +209,50 @@ export default {
       formatDate,
       trimmContent,
       toggleCommentModal,
+      toggleLikesModal,
       likePost,
-      viewPost,
+      togglePostModal,
       closePostModal,
+      closeLikesModal,
       post,
       selectedPost,
-      fullPost,
       postComments,
       showCommentModal,
-      showPostModal
+      showPostModal,
+      showLikesModal,
+      likesUsers
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+#dashboard .post span.liked {
+  color: red;
+}
+.post ul li {
+  position: relative;
+}
+#dashboard .post .likesModal ul li {
+  display: block;
+}
+#dashboard .post .likesModal .close {
+  position: absolute;
+  right: 2rem;
+  top: 2rem;
+}
+.likesModal {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 0 20px 0 rgba(52, 73, 94, 0.5);
+  overflow: auto;
+  padding: 2rem;
+  width: 300px;
+  height: 150px;
+  z-index: 99;
+}
+</style>

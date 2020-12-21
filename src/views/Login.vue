@@ -8,11 +8,8 @@
       <div class="col1">
         <h1>Vuegram</h1>
         <p>
-          Welcome to the
-          <a href="https://savvyapps.com/" target="_blank">Savvy Apps</a> sample
-          social media web app powered by Vue.js and Firebase. Build this
-          project by checking out The Definitive Guide to Getting Started with
-          Vue.js
+          Welcome to the sample social media web app powered by Vue.js and
+          Firebase.
         </p>
       </div>
       <div :class="{ 'signup-form': !showLoginForm }" class="col2">

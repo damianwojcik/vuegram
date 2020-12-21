@@ -35,7 +35,7 @@ const store = createStore({
     },
     async fetchUserProfile({ commit }, user) {
       const userProfile = await fb.usersCollection.doc(user.uid).get()
-      commit('setUserProfile', userProfile.data())
+      commit('setUserProfile', { id:user.uid, ...userProfile.data()})
       if (router.currentRoute.value.path === '/login') {
         router.push('/')
       }
@@ -63,25 +63,24 @@ const store = createStore({
         userId: fb.auth.currentUser.uid,
         userName: state.userProfile.name,
         comments: 0,
-        likes: 0
+        likes: []
       })
     },
     // eslint-disable-next-line no-unused-vars
-    async likePost ({ commit }, post) {
+    async likePost ({ commit }, postId) {
       const userId = fb.auth.currentUser.uid
-      const docId = `${userId}_${post.id}`
-      const doc = await fb.likesCollection.doc(docId).get()
+      const post = await fb.postsCollection.doc(postId).get();
+      const likesArr = post.data().likes
 
-      if (doc.exists) { return }
-    
-      await fb.likesCollection.doc(docId).set({
-        postId: post.id,
-        userId: userId
-      })
-    
-      fb.postsCollection.doc(post.id).update({
-        likes: post.likesCount + 1
-      })
+      if (likesArr.includes(userId)) { 
+        await fb.postsCollection.doc(postId).update({
+          likes: likesArr.filter(val => val !== userId)
+        })
+       } else {
+        await fb.postsCollection.doc(postId).update({
+          likes: likesArr.concat(userId).slice(0).reverse()
+        })
+       }
     },
     async updateProfile({ dispatch }, user) {
       const userId = fb.auth.currentUser.uid
