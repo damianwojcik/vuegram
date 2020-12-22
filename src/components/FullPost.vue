@@ -2,7 +2,7 @@
   <transition name="fade">
     <div class="p-modal">
       <div class="p-container">
-        <a @click="$emit('close')" class="close">&times;</a>
+        <a @click="close(post.id)" class="close">&times;</a>
         <div class="post">
           <h5>{{ post.userName }}</h5>
           <span>{{ formatDate(post.createdOn) }}</span>
@@ -36,21 +36,24 @@
               </div>
             </li>
             <li>
-              <a>{{ post.comments }} comments</a>
+              <span>{{ post.comments.length }}&nbsp;comments&nbsp;</span>
+            </li>
+            <li>
+              <a @click="toggleCommentModal(post)">add comment</a>
             </li>
           </ul>
+          <CommentModal
+            v-if="showCommentModal"
+            :post="post"
+            :toggle="toggleCommentModal"
+            :showCommentModal="showCommentModal"
+          ></CommentModal>
         </div>
-        <div v-show="postComments.length" class="comments">
-          <div
-            v-for="comment in postComments"
-            :key="comment.id"
-            class="comment"
-          >
-            <p>{{ comment.userName }}</p>
-            <span>{{ formatDate(comment.createdOn) }}</span>
-            <p>{{ comment.content }}</p>
-          </div>
-        </div>
+        <CommentsList
+          v-if="post.comments.length"
+          :postComments="post.comments"
+          :formatDate="formatDate"
+        />
       </div>
     </div>
   </transition>
@@ -60,19 +63,26 @@
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import { usersCollection } from '@/firebase'
+import CommentModal from '@/components/CommentModal'
+import CommentsList from '@/components/CommentsList'
 
 export default {
   props: {
     post: Object,
-    postComments: Object,
     formatDate: Function,
-    likePost: Function
+    likePost: Function,
+    close: Function
+  },
+  components: {
+    CommentModal,
+    CommentsList
   },
   setup() {
     const store = useStore()
     const userProfile = computed(() => store.state.userProfile)
     const showLikesInnerModal = ref(false)
     const likesUsers = ref([])
+    const showCommentModal = ref(false)
 
     function toggleLikesInnerModal(likes) {
       showLikesInnerModal.value = !showLikesInnerModal.value
@@ -89,12 +99,18 @@ export default {
       likesUsers.value = []
     }
 
+    function toggleCommentModal() {
+      showCommentModal.value = !showCommentModal.value
+    }
+
     return {
       userProfile,
       toggleLikesInnerModal,
       closeLikesInnerModal,
       showLikesInnerModal,
-      likesUsers
+      likesUsers,
+      toggleCommentModal,
+      showCommentModal
     }
   }
 }

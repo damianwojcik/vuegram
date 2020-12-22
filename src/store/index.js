@@ -62,8 +62,9 @@ const store = createStore({
         content: post.content,
         userId: fb.auth.currentUser.uid,
         userName: state.userProfile.name,
-        comments: 0,
-        likes: []
+        comments: [],
+        likes: [],
+        visibleComments: false
       })
     },
     // eslint-disable-next-line no-unused-vars
@@ -78,7 +79,7 @@ const store = createStore({
         })
        } else {
         await fb.postsCollection.doc(postId).update({
-          likes: likesArr.concat(userId).slice(0).reverse()
+          likes: likesArr.concat(userId).slice(0)
         })
        }
     },

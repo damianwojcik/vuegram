@@ -1,10 +1,14 @@
 <template>
   <div class="c-container">
-    <a @click="$emit('close')">close</a>
+    <a @click="toggle(post)">close</a>
     <p>add a comment</p>
     <form @submit.prevent>
       <textarea v-model.trim="comment"></textarea>
-      <button @click="addComment()" :disabled="comment == ''" class="button">
+      <button
+        @click="addComment(post)"
+        :disabled="comment == ''"
+        class="button"
+      >
         add comment
       </button>
     </form>
@@ -18,27 +22,30 @@ import { commentsCollection, postsCollection, auth } from '@/firebase'
 
 export default {
   props: {
-    post: Object
+    post: Object,
+    toggle: Function
   },
-  setup(props, { emit }) {
+  setup(props) {
     const store = useStore()
     const comment = ref('')
     const userName = computed(() => store.state.userProfile.name).value
 
-    async function addComment() {
-      await commentsCollection.add({
+    async function addComment(post) {
+      const newComment = {
         createdOn: new Date(),
         content: comment.value,
-        postId: props.post.id,
+        postId: post.id,
         userId: auth.currentUser.uid,
         userName: userName
+      }
+      await commentsCollection.add(newComment)
+      await postsCollection.doc(post.id).update({
+        comments: [newComment, ...post.comments]
       })
 
-      await postsCollection.doc(props.post.id).update({
-        comments: parseInt(props.post.comments) + 1
-      })
-
-      emit('close')
+      if (props.toggle) {
+        props.toggle(post)
+      }
     }
 
     return {

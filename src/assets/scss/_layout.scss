@@ -331,7 +331,7 @@ header {
     .p-container {
       position: fixed;
       max-width: 600px;
-      height: 300px;
+      height: 500px;
       top: 2vh;
       bottom: 2vh;
       left: 0;
@@ -356,32 +356,6 @@ header {
 
         &:hover {
           background: $white;
-        }
-      }
-
-      .comment {
-        font-size: 14px;
-        padding: 1.5rem;
-        border-top: 1px solid #e6ecf0;
-
-        &:first-of-type {
-          border-top: 0;
-        }
-
-        h5 {
-          margin: 0 0 0.5rem;
-        }
-
-        span {
-          display: block;
-          font-style: italic;
-          font-size: 12px;
-          margin-bottom: 0.5rem;
-          color: darken($light, 20%);
-        }
-
-        p {
-          margin: 0;
         }
       }
     }

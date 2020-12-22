@@ -1,15 +1,5 @@
 <template>
   <div id="dashboard">
-    <transition name="fade">
-      <FullPost
-        v-if="showPostModal"
-        :post="selectedPost"
-        :formatDate="formatDate"
-        :likePost="likePost"
-        :postComments="postComments"
-        @close="togglePostModal()"
-      ></FullPost>
-    </transition>
     <section>
       <div class="col1">
         <div class="profile">
@@ -18,10 +8,10 @@
           <div class="create-post">
             <p>create a post</p>
             <form @submit.prevent>
-              <textarea v-model.trim="post.content"></textarea>
+              <textarea v-model.trim="newPost.content"></textarea>
               <button
                 @click="createPost()"
-                :disabled="post.content === ''"
+                :disabled="newPost.content === ''"
                 class="button"
               >
                 Post
@@ -33,6 +23,15 @@
       <div class="col2">
         <div v-if="posts.length">
           <div v-for="post in posts" :key="post.id" class="post">
+            <transition name="fade">
+              <FullPost
+                v-if="showPostModal === post.id"
+                :post="post"
+                :formatDate="formatDate"
+                :likePost="likePost"
+                :close="togglePostModal"
+              ></FullPost>
+            </transition>
             <h5>{{ post.userName }}</h5>
             <span>{{ formatDate(post.createdOn) }}</span>
             <p>{{ trimmContent(post.content) }}</p>
@@ -66,17 +65,24 @@
               </li>
               <li>
                 <a @click="toggleCommentModal(post)"
-                  >comments {{ post.comments }}</a
+                  >{{ post.comments.length }} comments</a
                 >
               </li>
               <li><a @click="togglePostModal(post)">view full post</a></li>
             </ul>
             <transition name="fade">
               <CommentModal
-                v-if="showCommentModal && post.id === selectedPost.id"
-                :post="selectedPost"
-                @close="toggleCommentModal()"
+                v-if="post.visibleComments"
+                :post="post"
+                :toggle="toggleCommentModal"
               ></CommentModal>
+            </transition>
+            <transition name="fade">
+              <CommentsList
+                v-if="post.visibleComments && post.comments.length"
+                :postComments="post.comments"
+                :formatDate="formatDate"
+              />
             </transition>
           </div>
         </div>
@@ -89,32 +95,32 @@
 </template>
 <script>
 import { ref, computed } from 'vue'
-import { usersCollection, commentsCollection } from '@/firebase'
+import { usersCollection } from '@/firebase'
 import { useStore } from 'vuex'
 import moment from 'moment'
 import CommentModal from '@/components/CommentModal'
+import CommentsList from '@/components/CommentsList'
 import FullPost from '@/components/FullPost'
 
 export default {
   components: {
     CommentModal,
-    FullPost
+    FullPost,
+    CommentsList
   },
   setup() {
     const store = useStore()
     const userProfile = computed(() => store.state.userProfile)
     const posts = computed(() => store.state.posts)
-    const post = ref({ content: '' })
-    const selectedPost = ref({})
-    const postComments = ref([])
     const likesUsers = ref([])
+    const newPost = ref({ content: '' })
     const showCommentModal = ref(false)
-    const showPostModal = ref(false)
+    const showPostModal = ref('')
     const showLikesModal = ref('')
 
     function createPost() {
-      store.dispatch('createPost', { content: post.value.content })
-      post.value.content = ''
+      store.dispatch('createPost', { content: newPost.value.content })
+      newPost.value.content = ''
     }
 
     function formatDate(val) {
@@ -134,13 +140,7 @@ export default {
     }
 
     function toggleCommentModal(post) {
-      showCommentModal.value = !showCommentModal.value
-
-      if (showCommentModal.value) {
-        selectedPost.value = post
-      } else {
-        selectedPost.value = {}
-      }
+      post.visibleComments = !post.visibleComments
     }
 
     function toggleLikesModal(postId, likes) {
@@ -154,47 +154,15 @@ export default {
     }
 
     function likePost(postId) {
-      const userId = userProfile.value.id
       store.dispatch('likePost', postId)
-
-      if (Object.keys(selectedPost.value).length > 0) {
-        const likesArr = Object.values(selectedPost.value.likes)
-        if (likesArr.includes(userId)) {
-          const filteredLikesArr = likesArr.filter((val) => val !== userId)
-          selectedPost.value.likes = filteredLikesArr
-        } else {
-          likesArr.push(userId)
-          selectedPost.value.likes = likesArr
-        }
-      }
     }
 
     async function togglePostModal(post) {
-      showPostModal.value = !showPostModal.value
-
-      if (post) {
-        if (showPostModal.value) {
-          selectedPost.value = post
-        } else {
-          selectedPost.value = {}
-        }
-
-        const docs = await commentsCollection
-          .where('postId', '==', post.id)
-          .get()
-
-        docs.forEach((doc) => {
-          let comment = doc.data()
-          comment.id = doc.id
-          postComments.value.push(comment)
-        })
-      }
+      showPostModal.value = post.id
     }
 
     function closePostModal() {
       showPostModal.value = false
-      selectedPost.value = {}
-      postComments.value = []
     }
 
     function closeLikesModal() {
@@ -214,9 +182,7 @@ export default {
       togglePostModal,
       closePostModal,
       closeLikesModal,
-      post,
-      selectedPost,
-      postComments,
+      newPost,
       showCommentModal,
       showPostModal,
       showLikesModal,
