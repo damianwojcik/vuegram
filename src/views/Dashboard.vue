@@ -5,19 +5,7 @@
         <div class="profile">
           <h5>{{ userProfile.name }}</h5>
           <p>{{ userProfile.title }}</p>
-          <div class="create-post">
-            <p>create a post</p>
-            <form @submit.prevent>
-              <textarea v-model.trim="newPost.content"></textarea>
-              <button
-                @click="createPost()"
-                :disabled="newPost.content === ''"
-                class="button"
-              >
-                Post
-              </button>
-            </form>
-          </div>
+          <CreatePost />
         </div>
       </div>
       <div class="col2">
@@ -98,12 +86,14 @@ import { ref, computed } from 'vue'
 import { usersCollection } from '@/firebase'
 import { useStore } from 'vuex'
 import moment from 'moment'
+import CreatePost from '@/components/CreatePost'
 import CommentModal from '@/components/CommentModal'
 import CommentsList from '@/components/CommentsList'
 import FullPost from '@/components/FullPost'
 
 export default {
   components: {
+    CreatePost,
     CommentModal,
     FullPost,
     CommentsList
@@ -113,15 +103,9 @@ export default {
     const userProfile = computed(() => store.state.userProfile)
     const posts = computed(() => store.state.posts)
     const likesUsers = ref([])
-    const newPost = ref({ content: '' })
     const showCommentModal = ref(false)
     const showPostModal = ref('')
     const showLikesModal = ref('')
-
-    function createPost() {
-      store.dispatch('createPost', { content: newPost.value.content })
-      newPost.value.content = ''
-    }
 
     function formatDate(val) {
       if (!val) {
@@ -173,7 +157,6 @@ export default {
     return {
       userProfile,
       posts,
-      createPost,
       formatDate,
       trimmContent,
       toggleCommentModal,
@@ -182,7 +165,6 @@ export default {
       togglePostModal,
       closePostModal,
       closeLikesModal,
-      newPost,
       showCommentModal,
       showPostModal,
       showLikesModal,
@@ -193,6 +175,105 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../assets/scss/variables';
+
+#dashboard {
+  section {
+    padding: 2rem 0;
+  }
+
+  .col1 {
+    flex: 0 0 30%;
+
+    @media screen and (max-width: 1000px) {
+      flex: 0 0 40%;
+    }
+  }
+
+  .profile {
+    background: $white;
+    padding: 2rem;
+
+    p {
+      color: $medium;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .hidden-posts {
+    text-align: center;
+    border: 1px solid #e6ecf0;
+    font-size: 14px;
+    border-bottom: 0;
+    background: $white;
+
+    &:hover {
+      background: #f5f8fa;
+      cursor: pointer;
+    }
+
+    .new-posts {
+      color: $primary;
+    }
+
+    p {
+      padding: 15px;
+      margin: 0 auto;
+      color: darken($light, 25%);
+    }
+  }
+
+  .post {
+    border: 1px solid #e6ecf0;
+    border-bottom: 0;
+    font-size: 14px;
+    padding: 1.5rem;
+    background: $white;
+
+    &:hover {
+      background: #f5f8fa;
+    }
+
+    &:last-of-type {
+      border-bottom: 1px solid $light;
+    }
+
+    h5 {
+      margin: 0 0 0.5rem;
+    }
+
+    span {
+      display: block;
+      font-style: italic;
+      font-size: 12px;
+      margin-bottom: 0.5rem;
+      color: darken($light, 25%);
+    }
+
+    p {
+      margin: 0;
+    }
+
+    ul {
+      list-style: none;
+      margin: 1rem 0 0;
+      padding: 0;
+
+      li {
+        display: inline-block;
+        margin-right: 1rem;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .no-results {
+    border: 1px solid #e6ecf0;
+    background: $white;
+    text-align: center;
+    padding: 100px 1rem;
+  }
+}
 #dashboard .post span.liked {
   color: red;
 }

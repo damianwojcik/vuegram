@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
-    <div class="p-modal">
-      <div class="p-container">
+    <div class="p-modal" @click="close(post.id)">
+      <div class="p-container" @click.stop>
         <a @click="close(post.id)" class="close">&times;</a>
         <div class="post">
           <h5>{{ post.userName }}</h5>
@@ -117,8 +117,72 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../assets/scss/variables';
+
 #dashboard .post span.liked {
   color: red;
+}
+.post {
+  border: 1px solid #e6ecf0;
+  border-bottom: 0;
+  font-size: 14px;
+  padding: 1.5rem;
+  background: $white;
+
+  &:hover {
+    background: #f5f8fa;
+  }
+
+  &:last-of-type {
+    border-bottom: 1px solid $light;
+  }
+
+  h5 {
+    margin: 0 0 0.5rem;
+  }
+
+  span {
+    display: block;
+    font-style: italic;
+    font-size: 12px;
+    margin-bottom: 0.5rem;
+    color: darken($light, 25%);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  ul {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+
+    li {
+      display: inline-block;
+      margin-right: 1rem;
+      font-size: 12px;
+    }
+  }
+}
+.post ul {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+
+  li {
+    display: inline-block;
+    margin-right: 1rem;
+    font-size: 12px;
+  }
+
+  span {
+    display: block;
+    font-style: italic;
+    font-size: 12px;
+    margin-bottom: 0.5rem;
+    color: darken($light, 25%);
+  }
 }
 .post ul li {
   position: relative;
@@ -144,5 +208,47 @@ export default {
   width: 300px;
   height: 150px;
   z-index: 99;
+}
+
+.p-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba($dark, 0.4);
+  z-index: 999;
+
+  .p-container {
+    position: fixed;
+    max-width: 600px;
+    height: 500px;
+    top: 2vh;
+    bottom: 2vh;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 3px;
+    background: $white;
+    box-shadow: 0 0 20px 0 rgba($dark, 0.5);
+    overflow: auto;
+
+    .close {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      padding: 5px;
+    }
+
+    .post {
+      border: 0;
+      border-bottom: 1px solid #e6ecf0;
+
+      &:hover {
+        background: $white;
+      }
+    }
+  }
 }
 </style>

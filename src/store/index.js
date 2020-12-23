@@ -44,8 +44,11 @@ const store = createStore({
       const { user } = await fb.auth.createUserWithEmailAndPassword(form.email, form.password)
     
       await fb.usersCollection.doc(user.uid).set({
+        photo: '',
+        email: form.email,
         name: form.name,
-        title: form.title
+        title: '',
+        phone: form.phone
       })
     
       dispatch('fetchUserProfile', user)
@@ -83,11 +86,31 @@ const store = createStore({
         })
        }
     },
+    async addComment({state}, {post, comment}) {
+      const userId = fb.auth.currentUser.uid
+      const userName = state.userProfile.name
+      
+      const newComment = {
+        createdOn: new Date(),
+        content: comment,
+        postId: post.id,
+        userId,
+        userName
+      }
+
+      await fb.commentsCollection.add(newComment)
+      await fb.postsCollection.doc(post.id).update({
+        comments: [newComment, ...post.comments]
+      })
+    },
     async updateProfile({ dispatch }, user) {
       const userId = fb.auth.currentUser.uid
       await fb.usersCollection.doc(userId).update({
+        photo: user.photo,
         name: user.name,
-        title: user.title
+        title: user.title,
+        email: user.email,
+        phone: user.phone,
       })
     
       dispatch('fetchUserProfile', { uid: userId })

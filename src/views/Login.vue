@@ -1,5 +1,5 @@
 <template>
-  <div id="login">
+  <div class="login">
     <PasswordReset
       v-if="showPasswordReset"
       @close="togglePasswordReset()"
@@ -46,17 +46,17 @@
             <input
               v-model.trim="signupForm.name"
               type="text"
-              placeholder="Savvy Apps"
+              placeholder="John Doe"
               id="name"
             />
           </div>
           <div>
-            <label for="title">Title</label>
+            <label for="phone">Phone Number</label>
             <input
-              v-model.trim="signupForm.title"
-              type="text"
-              placeholder="Company"
-              id="title"
+              v-model.trim="signupForm.phone"
+              type="number"
+              placeholder="123456789"
+              id="phone"
             />
           </div>
           <div>
@@ -64,7 +64,7 @@
             <input
               v-model.trim="signupForm.email"
               type="text"
-              placeholder="you@email.com"
+              placeholder="john@email.com"
               id="email2"
             />
           </div>
@@ -99,7 +99,7 @@ export default {
   setup() {
     const store = useStore()
     const loginForm = ref({ email: '', password: '' })
-    const signupForm = ref({ name: '', title: '', email: '', password: '' })
+    const signupForm = ref({ name: '', phone: '', email: '', password: '' })
     const showLoginForm = ref(true)
     const showPasswordReset = ref(false)
 
@@ -123,7 +123,7 @@ export default {
         email: signupForm.value.email,
         password: signupForm.value.password,
         name: signupForm.value.name,
-        title: signupForm.value.title
+        phone: signupForm.value.phone
       })
     }
 
@@ -140,3 +140,78 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../assets/scss/variables';
+
+.login {
+  background: linear-gradient(
+    to right,
+    $primary 0%,
+    $primary 50%,
+    $white 50%,
+    $white 100%
+  );
+
+  @media screen and (max-width: 742px) {
+    height: 100vh;
+    background: $white;
+  }
+
+  .col1,
+  .col2 {
+    height: 100vh;
+    padding-top: 30vh;
+    @media screen and (max-width: 742px) {
+      height: auto;
+      padding-top: 20vh;
+    }
+  }
+
+  .col1 {
+    color: $white;
+    @media screen and (max-width: 742px) {
+      display: none;
+    }
+
+    p {
+      max-width: 490px;
+      margin-top: 2rem;
+      line-height: 1.8;
+    }
+
+    a {
+      color: $white;
+      text-decoration: underline;
+    }
+  }
+
+  .signup-form {
+    padding-top: 20vh;
+    @media screen and (max-width: 742px) {
+      padding-top: 10vh;
+    }
+  }
+
+  .col2 {
+    h1 {
+      margin-bottom: 2rem;
+    }
+
+    form {
+      max-width: 450px;
+      margin: 0 auto;
+    }
+
+    .extras {
+      float: right;
+      text-align: right;
+
+      a {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+</style>
