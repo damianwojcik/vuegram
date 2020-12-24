@@ -55,8 +55,9 @@
                 >
               </li>
               <li><a @click="togglePostModal(post)">view full post</a></li>
-              <li v-if="post.userId === userProfile.id">
-                <DeletePost :post="post" />
+              <li class="user-options" v-if="post.userId === userProfile.id">
+                <EditPost :post="post" />
+                <DeletePost :postId="post.id" />
               </li>
             </ul>
             <transition name="fade">
@@ -92,6 +93,7 @@ import CommentsList from '@/components/CommentsList'
 import FullPost from '@/components/FullPost'
 import Likes from '@/components/Likes'
 import DeletePost from '@/components/DeletePost'
+import EditPost from '@/components/EditPost'
 
 export default {
   components: {
@@ -100,7 +102,8 @@ export default {
     FullPost,
     Likes,
     CommentsList,
-    DeletePost
+    DeletePost,
+    EditPost
   },
   setup() {
     const store = useStore()
@@ -276,6 +279,14 @@ export default {
         display: inline-block;
         margin-right: 1rem;
         font-size: 12px;
+
+        &.user-options {
+          display: inline-flex;
+
+          *:nth-child(even) {
+            margin-left: 5px;
+          }
+        }
       }
     }
   }

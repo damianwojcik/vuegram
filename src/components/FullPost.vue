@@ -28,6 +28,10 @@
             <li>
               <a @click="toggleCommentModal(post)">add comment</a>
             </li>
+            <li class="user-options" v-if="post.userId === userProfile.id">
+              <EditPost :post="post" />
+              <DeletePost :postId="post.id" />
+            </li>
           </ul>
           <transition name="fade">
             <CommentModal
@@ -55,6 +59,8 @@ import { usersCollection } from '@/firebase'
 import CommentModal from '@/components/CommentModal'
 import CommentsList from '@/components/CommentsList'
 import Likes from '@/components/Likes'
+import DeletePost from '@/components/DeletePost'
+import EditPost from '@/components/EditPost'
 
 export default {
   props: {
@@ -67,7 +73,9 @@ export default {
   components: {
     CommentModal,
     CommentsList,
-    Likes
+    Likes,
+    DeletePost,
+    EditPost
   },
   setup() {
     const store = useStore()
@@ -168,6 +176,14 @@ export default {
       display: inline-block;
       margin-right: 1rem;
       font-size: 12px;
+
+      &.user-options {
+        display: inline-flex;
+
+        *:nth-child(even) {
+          margin-left: 5px;
+        }
+      }
     }
   }
 }

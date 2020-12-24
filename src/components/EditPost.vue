@@ -1,27 +1,30 @@
 <template>
-  <div class="delete-post">
+  <div class="edit-post">
     <transition name="fade">
       <div class="modal" v-if="isModalVisible" @click="toggleModal">
         <div class="modal-content" @click.stop>
           <div @click="toggleModal" class="close">&times;</div>
-          <h3>Do you really want to delete this post?</h3>
+          <h3>Edit post</h3>
+          <textarea :value="post.content" @input="updateContent"></textarea>
           <ul class="buttons">
-            <li><button class="button" @click="toggleModal">No</button></li>
             <li>
-              <button class="button button--error" @click="deletePost(postId)">
-                Yes
+              <button class="button button--error" @click="toggleModal">
+                Cancel
+              </button>
+            </li>
+            <li>
+              <button class="button" @click="updatePost(post.id, content)">
+                Save
               </button>
             </li>
           </ul>
         </div>
       </div>
     </transition>
-    <a title="Delete post" @click="toggleModal">
+    <a title="Edit post" @click="toggleModal">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#000">
         <path
-          fill-rule="evenodd"
-          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-          clip-rule="evenodd"
+          d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
         />
       </svg>
     </a>
@@ -34,24 +37,32 @@ import { useStore } from 'vuex'
 
 export default {
   props: {
-    postId: String
+    post: Object
   },
-  setup() {
-    const isModalVisible = ref(false)
+  setup(props) {
     const store = useStore()
+    const isModalVisible = ref(false)
+    const content = ref(props.post.content)
 
     function toggleModal() {
       isModalVisible.value = !isModalVisible.value
     }
 
-    function deletePost(postId) {
-      store.dispatch('deletePost', postId)
+    function updatePost(postId, content) {
+      store.dispatch('updatePost', { postId, content })
+      isModalVisible.value = false
+    }
+
+    function updateContent(event) {
+      content.value = event.target.value
     }
 
     return {
       isModalVisible,
       toggleModal,
-      deletePost
+      updatePost,
+      updateContent,
+      content
     }
   }
 }
@@ -60,14 +71,14 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/scss/variables';
 
-.delete-post {
+.edit-post {
   position: relative;
   width: 20px;
   height: 20px;
   top: 5px;
 
   svg {
-    fill: $error;
+    fill: $primary;
   }
 }
 
@@ -85,7 +96,7 @@ export default {
     position: relative;
     margin: auto;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     background: #fff;
     padding: 40px;
     border-radius: 5px;
@@ -94,6 +105,10 @@ export default {
   }
 
   h3 {
+    margin-bottom: 30px;
+  }
+
+  textarea {
     margin-bottom: 30px;
   }
 

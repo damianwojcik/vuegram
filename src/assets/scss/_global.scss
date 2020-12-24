@@ -193,14 +193,14 @@ form {
       box-shadow: 0 0 5px 0 rgba($dark, 0.2);
     }
   }
+}
 
-  textarea {
-    resize: none;
-    border: 1px solid #e6ecf0;
-    outline: 0;
-    height: 100px;
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-  }
+textarea {
+  resize: none;
+  border: 1px solid #e6ecf0;
+  outline: 0;
+  height: 100px;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
 }
