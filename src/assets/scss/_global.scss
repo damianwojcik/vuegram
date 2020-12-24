@@ -144,6 +144,14 @@ section {
       background: $primary;
     }
   }
+
+  &--error {
+    background: $error;
+
+    &:hover {
+      background: darken($error, 10%);
+    }
+  }
 }
 
 .text-center {

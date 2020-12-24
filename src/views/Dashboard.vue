@@ -55,6 +55,9 @@
                 >
               </li>
               <li><a @click="togglePostModal(post)">view full post</a></li>
+              <li v-if="post.userId === userProfile.id">
+                <DeletePost :post="post" />
+              </li>
             </ul>
             <transition name="fade">
               <CommentModal
@@ -88,6 +91,7 @@ import CommentModal from '@/components/CommentModal'
 import CommentsList from '@/components/CommentsList'
 import FullPost from '@/components/FullPost'
 import Likes from '@/components/Likes'
+import DeletePost from '@/components/DeletePost'
 
 export default {
   components: {
@@ -95,7 +99,8 @@ export default {
     CommentModal,
     FullPost,
     Likes,
-    CommentsList
+    CommentsList,
+    DeletePost
   },
   setup() {
     const store = useStore()

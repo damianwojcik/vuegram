@@ -104,6 +104,13 @@ const store = createStore({
         })
        }
     },
+    // eslint-disable-next-line no-unused-vars
+    async deletePost({commit}, postId) {
+      // TODO: add snackbar with message instead of console.log
+      await fb.postsCollection.doc(postId).delete()
+      .then(() => console.log('Document successfully deleted!'))
+      .catch(error => console.log('Error removing document: ', error))
+    },
     async addComment({ state }, { post, comment }) {
       const userId = fb.auth.currentUser.uid
       const userName = state.userProfile.name
