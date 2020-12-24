@@ -20,31 +20,7 @@
           <p>{{ post.content }}</p>
           <ul>
             <li>
-              <a @click="likePost(post.id)">
-                <span
-                  v-bind:class="[
-                    post.likes.includes(userProfile.id) ? 'liked' : ''
-                  ]"
-                  >❤</span
-                >
-              </a>
-            </li>
-            <li>
-              <span v-if="post.likes.length === 0">
-                {{ post.likes.length }} likes</span
-              >
-              <a v-else @click="toggleLikesInnerModal(post.likes)">
-                {{ post.likes.length }} likes
-              </a>
-              <div v-if="showLikesInnerModal" class="likesModal">
-                <a @click="closeLikesInnerModal()" class="close">&times;</a>
-                <h5>Likes:</h5>
-                <ul>
-                  <li v-for="user in likesUsers" :key="user.id">
-                    {{ user.name }}
-                  </li>
-                </ul>
-              </div>
+              <Likes :post="post" />
             </li>
             <li>
               <span>{{ post.comments.length }}&nbsp;comments&nbsp;</span>
@@ -53,12 +29,14 @@
               <a @click="toggleCommentModal(post)">add comment</a>
             </li>
           </ul>
-          <CommentModal
-            v-if="showCommentModal"
-            :post="post"
-            :toggle="toggleCommentModal"
-            :showCommentModal="showCommentModal"
-          ></CommentModal>
+          <transition name="fade">
+            <CommentModal
+              v-if="showCommentModal"
+              :post="post"
+              :toggle="toggleCommentModal"
+              :showCommentModal="showCommentModal"
+            ></CommentModal>
+          </transition>
         </div>
         <CommentsList
           v-if="post.comments.length"
@@ -76,6 +54,7 @@ import { useStore } from 'vuex'
 import { usersCollection } from '@/firebase'
 import CommentModal from '@/components/CommentModal'
 import CommentsList from '@/components/CommentsList'
+import Likes from '@/components/Likes'
 
 export default {
   props: {
@@ -87,7 +66,8 @@ export default {
   },
   components: {
     CommentModal,
-    CommentsList
+    CommentsList,
+    Likes
   },
   setup() {
     const store = useStore()

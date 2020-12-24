@@ -27,7 +27,6 @@
                 v-if="showPostModal === post.id"
                 :post="post"
                 :formatDate="formatDate"
-                :likePost="likePost"
                 :close="togglePostModal"
                 :getUserData="getUserData"
               ></FullPost>
@@ -48,31 +47,7 @@
             <p>{{ trimmContent(post.content) }}</p>
             <ul>
               <li>
-                <a @click="likePost(post.id)">
-                  <span
-                    v-bind:class="[
-                      post.likes.includes(userProfile.id) ? 'liked' : ''
-                    ]"
-                    >❤</span
-                  >
-                </a>
-              </li>
-              <li>
-                <span v-if="post.likes.length === 0">
-                  {{ post.likes.length }} likes</span
-                >
-                <a v-else @click="toggleLikesModal(post.id, post.likes)">
-                  {{ post.likes.length }} likes
-                </a>
-                <div v-if="showLikesModal === post.id" class="likesModal">
-                  <a @click="closeLikesModal()" class="close">&times;</a>
-                  <h5>Likes:</h5>
-                  <ul>
-                    <li v-for="user in likesUsers" :key="user.id">
-                      {{ user.name }}
-                    </li>
-                  </ul>
-                </div>
+                <Likes :post="post" />
               </li>
               <li>
                 <a @click="toggleCommentModal(post)"
@@ -106,19 +81,20 @@
 </template>
 <script>
 import { ref, computed } from 'vue'
-import { usersCollection } from '@/firebase'
 import { useStore } from 'vuex'
 import moment from 'moment'
 import CreatePost from '@/components/CreatePost'
 import CommentModal from '@/components/CommentModal'
 import CommentsList from '@/components/CommentsList'
 import FullPost from '@/components/FullPost'
+import Likes from '@/components/Likes'
 
 export default {
   components: {
     CreatePost,
     CommentModal,
     FullPost,
+    Likes,
     CommentsList
   },
   setup() {
@@ -126,10 +102,8 @@ export default {
     const userProfile = computed(() => store.state.userProfile)
     const posts = computed(() => store.state.posts)
     const users = computed(() => store.state.users)
-    const likesUsers = ref([])
     const showCommentModal = ref(false)
     const showPostModal = ref('')
-    const showLikesModal = ref('')
 
     function formatDate(val) {
       if (!val) {
@@ -151,31 +125,12 @@ export default {
       post.visibleComments = !post.visibleComments
     }
 
-    function toggleLikesModal(postId, likes) {
-      showLikesModal.value = postId
-
-      likes.forEach(async (like) => {
-        const doc = await usersCollection.doc(like).get()
-        const user = { id: like, ...doc.data() }
-        likesUsers.value.unshift(user)
-      })
-    }
-
-    function likePost(postId) {
-      store.dispatch('likePost', postId)
-    }
-
     function togglePostModal(post) {
       showPostModal.value = post.id
     }
 
     function closePostModal() {
       showPostModal.value = false
-    }
-
-    function closeLikesModal() {
-      showLikesModal.value = ''
-      likesUsers.value = []
     }
 
     function getUserData(post) {
@@ -196,15 +151,10 @@ export default {
       formatDate,
       trimmContent,
       toggleCommentModal,
-      toggleLikesModal,
-      likePost,
       togglePostModal,
       closePostModal,
-      closeLikesModal,
       showCommentModal,
       showPostModal,
-      showLikesModal,
-      likesUsers,
       getUserData
     }
   }
@@ -330,34 +280,6 @@ export default {
     background: $white;
     text-align: center;
     padding: 100px 1rem;
-  }
-  .post span.liked {
-    color: red;
-  }
-  .post ul li {
-    position: relative;
-  }
-  .post .likesModal ul li {
-    display: block;
-  }
-  .post .likesModal .close {
-    position: absolute;
-    right: 2rem;
-    top: 2rem;
-  }
-  .likesModal {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: 3px;
-    background: #fff;
-    box-shadow: 0 0 20px 0 rgba(52, 73, 94, 0.5);
-    overflow: auto;
-    padding: 2rem;
-    width: 300px;
-    height: 150px;
-    z-index: 99;
   }
 }
 </style>

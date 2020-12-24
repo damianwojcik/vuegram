@@ -61,4 +61,8 @@ export default {
   padding: 0;
   margin-top: 30px;
 }
+
+textarea {
+  margin-bottom: 20px;
+}
 </style>
