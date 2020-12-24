@@ -15,10 +15,24 @@ fb.postsCollection.orderBy('createdOn', 'desc').onSnapshot(snapshot => {
   store.commit('setPosts', postsArray)
 })
 
+fb.usersCollection.onSnapshot(snapshot => {
+  let usersArray = [];
+
+  snapshot.forEach(doc => {
+    let user = doc.data()
+    user.id = doc.id
+
+    usersArray.push(user)
+  })
+
+  store.commit('setUsers', usersArray)
+})
+
 const store = createStore({
   state: {
     userProfile: {},
-    posts: []
+    posts: [],
+    users: []
   },
   mutations: {
     setUserProfile(state, payload) {
@@ -26,6 +40,9 @@ const store = createStore({
     },
     setPosts(state, payload) {
       state.posts = payload
+    },
+    setUsers(state, payload) {
+      state.users = payload
     }
   },
   actions: {
@@ -45,6 +62,7 @@ const store = createStore({
     
       await fb.usersCollection.doc(user.uid).set({
         photo: '',
+        username: '',
         email: form.email,
         name: form.name,
         title: '',
@@ -86,7 +104,7 @@ const store = createStore({
         })
        }
     },
-    async addComment({state}, {post, comment}) {
+    async addComment({ state }, { post, comment }) {
       const userId = fb.auth.currentUser.uid
       const userName = state.userProfile.name
       
@@ -106,7 +124,7 @@ const store = createStore({
     async updateProfile({ dispatch }, user) {
       const userId = fb.auth.currentUser.uid
       await fb.usersCollection.doc(userId).update({
-        photo: user.photo,
+        username: user.username,
         name: user.name,
         title: user.title,
         email: user.email,

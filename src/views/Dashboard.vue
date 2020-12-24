@@ -1,8 +1,19 @@
 <template>
-  <div id="dashboard">
+  <div class="dashboard">
     <section>
       <div class="col1">
         <div class="profile">
+          <div class="text-center">
+            <img
+              class="profile__avatar"
+              :alt="`${userProfile.name} photo`"
+              :src="
+                userProfile.photo
+                  ? userProfile.photo
+                  : require(`../assets/images/avatar-placeholder.jpg`)
+              "
+            />
+          </div>
           <h5>{{ userProfile.name }}</h5>
           <p>{{ userProfile.title }}</p>
           <CreatePost />
@@ -18,9 +29,21 @@
                 :formatDate="formatDate"
                 :likePost="likePost"
                 :close="togglePostModal"
+                :getUserData="getUserData"
               ></FullPost>
             </transition>
-            <h5>{{ post.userName }}</h5>
+            <div class="row">
+              <img
+                class="post__avatar"
+                :alt="`${getUserData(post).userName} photo`"
+                :src="
+                  getUserData(post).userPhoto
+                    ? getUserData(post).userPhoto
+                    : require(`../assets/images/avatar-placeholder.jpg`)
+                "
+              />
+              <h5>{{ post.userName }}</h5>
+            </div>
             <span>{{ formatDate(post.createdOn) }}</span>
             <p>{{ trimmContent(post.content) }}</p>
             <ul>
@@ -102,6 +125,7 @@ export default {
     const store = useStore()
     const userProfile = computed(() => store.state.userProfile)
     const posts = computed(() => store.state.posts)
+    const users = computed(() => store.state.users)
     const likesUsers = ref([])
     const showCommentModal = ref(false)
     const showPostModal = ref('')
@@ -141,7 +165,7 @@ export default {
       store.dispatch('likePost', postId)
     }
 
-    async function togglePostModal(post) {
+    function togglePostModal(post) {
       showPostModal.value = post.id
     }
 
@@ -154,9 +178,21 @@ export default {
       likesUsers.value = []
     }
 
+    function getUserData(post) {
+      const user = users.value.filter((user) => user.id === post.userId)[0]
+      const userName = user && user.name ? user.name : ''
+      const userPhoto = user && user.photo ? user.photo : ''
+
+      return {
+        userName,
+        userPhoto
+      }
+    }
+
     return {
       userProfile,
       posts,
+      users,
       formatDate,
       trimmContent,
       toggleCommentModal,
@@ -168,7 +204,8 @@ export default {
       showCommentModal,
       showPostModal,
       showLikesModal,
-      likesUsers
+      likesUsers,
+      getUserData
     }
   }
 }
@@ -177,7 +214,7 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/scss/variables';
 
-#dashboard {
+.dashboard {
   section {
     padding: 2rem 0;
   }
@@ -193,6 +230,14 @@ export default {
   .profile {
     background: $white;
     padding: 2rem;
+
+    &__avatar {
+      display: inline-block;
+      margin-bottom: 20px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+    }
 
     p {
       color: $medium;
@@ -230,16 +275,29 @@ export default {
     padding: 1.5rem;
     background: $white;
 
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+
+      h5 {
+        margin: 0 0 0 5px;
+      }
+    }
+
+    &__avatar {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+
     &:hover {
       background: #f5f8fa;
     }
 
     &:last-of-type {
       border-bottom: 1px solid $light;
-    }
-
-    h5 {
-      margin: 0 0 0.5rem;
     }
 
     span {
@@ -273,33 +331,33 @@ export default {
     text-align: center;
     padding: 100px 1rem;
   }
-}
-#dashboard .post span.liked {
-  color: red;
-}
-.post ul li {
-  position: relative;
-}
-#dashboard .post .likesModal ul li {
-  display: block;
-}
-#dashboard .post .likesModal .close {
-  position: absolute;
-  right: 2rem;
-  top: 2rem;
-}
-.likesModal {
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 3px;
-  background: #fff;
-  box-shadow: 0 0 20px 0 rgba(52, 73, 94, 0.5);
-  overflow: auto;
-  padding: 2rem;
-  width: 300px;
-  height: 150px;
-  z-index: 99;
+  .post span.liked {
+    color: red;
+  }
+  .post ul li {
+    position: relative;
+  }
+  .post .likesModal ul li {
+    display: block;
+  }
+  .post .likesModal .close {
+    position: absolute;
+    right: 2rem;
+    top: 2rem;
+  }
+  .likesModal {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 20px 0 rgba(52, 73, 94, 0.5);
+    overflow: auto;
+    padding: 2rem;
+    width: 300px;
+    height: 150px;
+    z-index: 99;
+  }
 }
 </style>

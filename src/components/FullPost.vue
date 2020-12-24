@@ -4,7 +4,18 @@
       <div class="p-container" @click.stop>
         <a @click="close(post.id)" class="close">&times;</a>
         <div class="post">
-          <h5>{{ post.userName }}</h5>
+          <div class="row">
+            <img
+              class="post__avatar"
+              :alt="`${getUserData(post).userName} photo`"
+              :src="
+                getUserData(post).userPhoto
+                  ? getUserData(post).userPhoto
+                  : require(`../assets/images/avatar-placeholder.jpg`)
+              "
+            />
+            <h5>{{ post.userName }}</h5>
+          </div>
           <span>{{ formatDate(post.createdOn) }}</span>
           <p>{{ post.content }}</p>
           <ul>
@@ -71,7 +82,8 @@ export default {
     post: Object,
     formatDate: Function,
     likePost: Function,
-    close: Function
+    close: Function,
+    getUserData: Function
   },
   components: {
     CommentModal,
@@ -129,16 +141,30 @@ export default {
   padding: 1.5rem;
   background: $white;
 
+  // TOOD: DRY with Dashboard.vue
+  .row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    h5 {
+      margin: 0 0 0 5px;
+    }
+  }
+
+  &__avatar {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
   &:hover {
     background: #f5f8fa;
   }
 
   &:last-of-type {
     border-bottom: 1px solid $light;
-  }
-
-  h5 {
-    margin: 0 0 0.5rem;
   }
 
   span {
