@@ -2,20 +2,23 @@
   <div class="dashboard">
     <section>
       <div class="col1">
-        <div class="profile">
-          <div class="text-center">
-            <img
-              class="profile__avatar"
-              :alt="`${userProfile.name} photo`"
-              :src="
-                userProfile.photo
-                  ? userProfile.photo
-                  : require(`../assets/images/avatar-placeholder.jpg`)
-              "
-            />
+        <div class="wrapper">
+          <div class="profile">
+            <div class="text-center">
+              <img
+                class="profile__avatar"
+                :alt="`${userProfile.name} photo`"
+                :src="
+                  userProfile.photo
+                    ? userProfile.photo
+                    : require(`../assets/images/avatar-placeholder.jpg`)
+                "
+              />
+            </div>
+            <h5>{{ userProfile.name }}</h5>
+            <h4>({{ userProfile.username }})</h4>
+            <p>{{ userProfile.title }}</p>
           </div>
-          <h5>{{ userProfile.name }}</h5>
-          <p>{{ userProfile.title }}</p>
           <CreatePost />
         </div>
       </div>
@@ -41,7 +44,13 @@
                     : require(`../assets/images/avatar-placeholder.jpg`)
                 "
               />
-              <h5>{{ post.userName }}</h5>
+              <h5>
+                {{
+                  getUserData(post).userUsername
+                    ? getUserData(post).userUsername
+                    : post.userName
+                }}
+              </h5>
             </div>
             <span>{{ formatDate(post.createdOn) }}</span>
             <p>{{ trimmContent(post.content) }}</p>
@@ -49,10 +58,13 @@
               <li>
                 <Likes :post="post" />
               </li>
-              <li>
+              <li v-if="!post.commentsDisabled">
                 <a @click="toggleCommentModal(post)"
                   >{{ post.comments.length }} comments</a
                 >
+              </li>
+              <li v-else>
+                <span>Comments disabled</span>
               </li>
               <li><a @click="togglePostModal(post)">view full post</a></li>
               <li class="user-options" v-if="post.userId === userProfile.id">
@@ -143,10 +155,12 @@ export default {
 
     function getUserData(post) {
       const user = users.value.filter((user) => user.id === post.userId)[0]
+      const userUsername = user && user.username ? user.username : ''
       const userName = user && user.name ? user.name : ''
       const userPhoto = user && user.photo ? user.photo : ''
 
       return {
+        userUsername,
         userName,
         userPhoto
       }
@@ -185,9 +199,14 @@ export default {
     }
   }
 
-  .profile {
+  .wrapper {
     background: $white;
     padding: 2rem;
+  }
+
+  .profile {
+    border-bottom: 1px solid #e6ecf0;
+    margin-bottom: 20px;
 
     &__avatar {
       display: inline-block;
@@ -195,6 +214,10 @@ export default {
       width: 150px;
       height: 150px;
       border-radius: 50%;
+    }
+
+    h4 {
+      font-size: 0.8rem;
     }
 
     p {
@@ -239,7 +262,7 @@ export default {
       margin-bottom: 10px;
 
       h5 {
-        margin: 0 0 0 5px;
+        margin: 0 0 0 10px;
       }
     }
 

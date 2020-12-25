@@ -22,11 +22,14 @@
             <li>
               <Likes :post="post" />
             </li>
-            <li>
+            <li v-if="!post.commentsDisabled">
               <span>{{ post.comments.length }}&nbsp;comments&nbsp;</span>
             </li>
-            <li>
+            <li v-if="!post.commentsDisabled">
               <a @click="toggleCommentModal(post)">add comment</a>
+            </li>
+            <li v-else>
+              <span>Comments disabled</span>
             </li>
             <li class="user-options" v-if="post.userId === userProfile.id">
               <EditPost :post="post" />
@@ -43,7 +46,7 @@
           </transition>
         </div>
         <CommentsList
-          v-if="post.comments.length"
+          v-if="post.comments.length && !post.commentsDisabled"
           :postComments="post.comments"
           :formatDate="formatDate"
         />

@@ -6,6 +6,16 @@
           <div @click="toggleModal" class="close">&times;</div>
           <h3>Edit post</h3>
           <textarea :value="post.content" @input="updateContent"></textarea>
+          <div class="checkbox-wrapper">
+            <input
+              type="checkbox"
+              id="cmmentsDisabled"
+              name="commentsDisabled"
+              :checked="post.commentsDisabled"
+              @click="toggleCommentsDisabled"
+            />
+            <label for="cmmentsDisabled">Disable comments</label>
+          </div>
           <ul class="buttons">
             <li>
               <button class="button button--error" @click="toggleModal">
@@ -13,7 +23,10 @@
               </button>
             </li>
             <li>
-              <button class="button" @click="updatePost(post.id, content)">
+              <button
+                class="button"
+                @click="updatePost(post.id, content, commentsDisabled)"
+              >
                 Save
               </button>
             </li>
@@ -43,13 +56,14 @@ export default {
     const store = useStore()
     const isModalVisible = ref(false)
     const content = ref(props.post.content)
+    const commentsDisabled = ref(false)
 
     function toggleModal() {
       isModalVisible.value = !isModalVisible.value
     }
 
-    function updatePost(postId, content) {
-      store.dispatch('updatePost', { postId, content })
+    function updatePost(postId, content, commentsDisabled) {
+      store.dispatch('updatePost', { postId, content, commentsDisabled })
       isModalVisible.value = false
     }
 
@@ -57,12 +71,18 @@ export default {
       content.value = event.target.value
     }
 
+    function toggleCommentsDisabled(event) {
+      commentsDisabled.value = event.target.checked
+    }
+
     return {
       isModalVisible,
       toggleModal,
       updatePost,
       updateContent,
-      content
+      content,
+      commentsDisabled,
+      toggleCommentsDisabled
     }
   }
 }
@@ -109,7 +129,17 @@ export default {
   }
 
   textarea {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+  }
+
+  .checkbox-wrapper {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: center;
+
+    input {
+      margin-right: 10px;
+    }
   }
 
   .buttons {

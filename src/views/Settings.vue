@@ -39,7 +39,7 @@
             @click="triggerFileUploader"
             :disabled="isLoading"
           >
-            <span v-if="isLoading">Loading...</span>
+            <span v-if="isLoading">Uploading...</span>
             <span v-else>Change</span>
           </button>
         </div>

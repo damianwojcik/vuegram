@@ -85,7 +85,8 @@ const store = createStore({
         userName: state.userProfile.name,
         comments: [],
         likes: [],
-        visibleComments: false
+        visibleComments: false,
+        commentsDisabled: post.commentsDisabled
       })
     },
     // eslint-disable-next-line no-unused-vars
@@ -112,10 +113,11 @@ const store = createStore({
       .catch(error => console.log('Error removing document: ', error))
     },
     // eslint-disable-next-line no-unused-vars
-    async updatePost({commit}, { postId, content }) {
+    async updatePost({commit}, { postId, content, commentsDisabled }) {
       // TODO: add snackbar with message instead of console.log
       await fb.postsCollection.doc(postId).update({
-        content
+        content,
+        commentsDisabled
       })
     },
     async addComment({ state }, { post, comment }) {

@@ -179,7 +179,7 @@ form {
     margin-bottom: 0.5rem;
   }
 
-  input {
+  input:not([type='checkbox']) {
     display: block;
     width: 100%;
     margin-bottom: 1rem;
