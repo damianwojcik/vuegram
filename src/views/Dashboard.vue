@@ -16,7 +16,7 @@
               />
             </div>
             <h5>{{ userProfile.name }}</h5>
-            <h4>({{ userProfile.username }})</h4>
+            <h4 v-if="userProfile.username">({{ userProfile.username }})</h4>
             <p>{{ userProfile.title }}</p>
           </div>
           <CreatePost />

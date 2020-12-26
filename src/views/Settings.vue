@@ -1,5 +1,5 @@
 <template>
-  <section id="settings">
+  <section class="settings">
     <div class="col1">
       <h3>Settings</h3>
       <p>Update your profile</p>
@@ -191,7 +191,7 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/scss/variables';
 
-#settings {
+.settings {
   padding: 2rem 0;
 
   .col1 {
