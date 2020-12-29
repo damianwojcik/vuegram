@@ -1,5 +1,5 @@
 <template>
-  <section class="settings">
+  <section class="container settings">
     <div class="col1">
       <h3>Settings</h3>
       <p>Update your profile</p>
@@ -60,6 +60,14 @@
           id="name"
         />
 
+        <label for="name">Hometown</label>
+        <input
+          v-model.trim="hometown"
+          type="text"
+          :placeholder="userProfile.hometown"
+          id="hometown"
+        />
+
         <label for="title">Job Title</label>
         <input
           v-model.trim="title"
@@ -110,6 +118,7 @@ export default {
     const title = ref('')
     const email = ref('')
     const phone = ref('')
+    const hometown = ref('')
     const errorMsg = ref('')
     const imageData = ref(null)
     const fileInput = ref(null)
@@ -123,7 +132,9 @@ export default {
         name: name.value !== '' ? name.value : userProfile.value.name,
         title: title.value !== '' ? title.value : userProfile.value.title,
         email: email.value !== '' ? email.value : userProfile.value.email,
-        phone: phone.value !== '' ? phone.value : userProfile.value.phone
+        phone: phone.value !== '' ? phone.value : userProfile.value.phone,
+        hometown:
+          hometown.value !== '' ? hometown.value : userProfile.value.hometown
       })
 
       username.value = ''
@@ -131,6 +142,7 @@ export default {
       title.value = ''
       email.value = ''
       phone.value = ''
+      hometown.value = ''
 
       showSuccess.value = true
 
@@ -175,6 +187,7 @@ export default {
       title,
       email,
       phone,
+      hometown,
       imageData,
       showSuccess,
       updateProfile,
@@ -192,14 +205,7 @@ export default {
 @import '../assets/scss/variables';
 
 .settings {
-  padding: 2rem 0;
-
-  .col1 {
-    max-width: 600px;
-    margin: 5vh auto 0;
-    background: $white;
-    padding: 2rem;
-  }
+  background: $white;
 
   .avatar {
     display: inline-block;

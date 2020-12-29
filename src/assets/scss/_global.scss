@@ -79,6 +79,13 @@ section {
   }
 }
 
+.container {
+  position: relative;
+  margin: 5vh auto 0;
+  padding: 32px;
+  max-width: 680px;
+}
+
 .col1,
 .col2 {
   flex-grow: 1;

@@ -17,7 +17,8 @@
             </div>
             <h5>{{ userProfile.name }}</h5>
             <h4 v-if="userProfile.username">({{ userProfile.username }})</h4>
-            <p>{{ userProfile.title }}</p>
+            <p v-if="userProfile.title">{{ userProfile.title }}</p>
+            <span v-if="userProfile.hometown">{{ userProfile.hometown }}</span>
           </div>
           <CreatePost />
         </div>
@@ -89,7 +90,7 @@
           </div>
         </div>
         <div v-else>
-          <p class="no-results">There are currently no posts</p>
+          <p class="no-results">There are currently no posts.</p>
         </div>
       </div>
     </section>
@@ -207,6 +208,7 @@ export default {
   .profile {
     border-bottom: 1px solid #e6ecf0;
     margin-bottom: 20px;
+    padding-bottom: 1rem;
 
     &__avatar {
       display: inline-block;
@@ -222,7 +224,11 @@ export default {
 
     p {
       color: $medium;
-      margin-bottom: 1rem;
+    }
+
+    span {
+      font-size: 15px;
+      color: $secondary-text;
     }
   }
 

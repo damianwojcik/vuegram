@@ -23,7 +23,23 @@ const routes = [
     meta: {
       requiresAuth: true
     }
-  }
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: () => import(/* webpackChunkName: "users" */ '../views/Users.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/:userId',
+    name: 'User',
+    component: () => import(/* webpackChunkName: "user" */ '../views/User.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
 ]
 
 const router = createRouter({

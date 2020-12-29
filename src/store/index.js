@@ -66,7 +66,9 @@ const store = createStore({
         email: form.email,
         name: form.name,
         title: '',
-        phone: form.phone
+        phone: form.phone,
+        hometown: '',
+        friends: []
       })
     
       dispatch('fetchUserProfile', user)
@@ -120,6 +122,42 @@ const store = createStore({
         commentsDisabled
       })
     },
+    async addFriend({ state }, targetUserId) {
+      const currentUserId = state.userProfile.id
+      const currentUserFriends = state.userProfile.friends
+      const targetUser = await fb.usersCollection.doc(targetUserId).get()
+      const targetUserFriends = targetUser.data().friends
+
+      if(targetUserFriends.filter(friend => friend.userId === currentUserId).length > 0
+        || currentUserFriends.filter(friend => friend.userId === targetUserId).length > 0) {
+        const filteredTargetUserFriends = targetUserFriends.filter(friend => friend.userId !== currentUserId)
+        const filteredCurrentUserFriends = currentUserFriends.filter(friend => friend.userId !== targetUserId)
+       
+        await fb.usersCollection.doc(targetUserId).update({
+          friends: filteredTargetUserFriends
+        })
+
+        await fb.usersCollection.doc(currentUserId).update({
+          friends: filteredCurrentUserFriends
+        })
+
+        return
+      }
+
+      await fb.usersCollection.doc(targetUserId).update({
+          friends: [...targetUserFriends, {
+            userId: currentUserId,
+            status: 'pending'
+          }]
+        })
+
+        await fb.usersCollection.doc(currentUserId).update({
+          friends: [...currentUserFriends, {
+            userId: targetUserId,
+            status: 'pending'
+          }]
+        })
+    },
     async addComment({ state }, { post, comment }) {
       const userId = fb.auth.currentUser.uid
       const userName = state.userProfile.name
@@ -145,6 +183,7 @@ const store = createStore({
         title: user.title,
         email: user.email,
         phone: user.phone,
+        hometown: user.hometown,
       })
     
       dispatch('fetchUserProfile', { uid: userId })
