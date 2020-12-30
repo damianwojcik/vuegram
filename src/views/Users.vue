@@ -1,5 +1,61 @@
 <template>
+  <div v-if="modalVisible" class="modal" @click="toggleModalVisibility()">
+    <div class="modal-content" @click.stop>
+      <div @click="toggleModalVisibility()" class="close">&times;</div>
+      <h3>Delete friend</h3>
+      <p>
+        Do you really want to delete
+        <strong>{{ selectedUser.name }}</strong> from friends?
+      </p>
+      <div class="buttons">
+        <button
+          @click="removeFriend(selectedUser.id)"
+          class="button button--primary"
+        >
+          Delete
+        </button>
+        <button @click="toggleModalVisibility()" class="button button--gray">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
   <div class="container">
+    <h3 v-if="requestedUsers.length">Requests</h3>
+    <ul v-if="requestedUsers.length">
+      <li v-for="user in requestedUsers" :key="user.id">
+        <router-link class="link-photo" :to="user.id">
+          <img
+            :alt="`${user.name} photo`"
+            :src="
+              user.photo
+                ? user.photo
+                : require(`../assets/images/avatar-placeholder.jpg`)
+            "
+            class="photo"
+          />
+        </router-link>
+        <div class="wrapper">
+          <router-link :to="user.id">
+            <h5>{{ user.name }}</h5>
+          </router-link>
+          <div class="buttons">
+            <button
+              @click="acceptFriend(user.id)"
+              class="button button--primary"
+            >
+              Accept
+            </button>
+            <button
+              @click="toggleModalVisibility(user.id, user.name)"
+              class="button button--gray"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
     <h3>Users</h3>
     <ul v-if="filteredUsers.length">
       <li v-for="user in filteredUsers" :key="user.id">
@@ -15,17 +71,19 @@
           />
         </router-link>
         <div class="wrap">
-          <h5>
-            <router-link :to="user.id">
+          <router-link :to="user.id">
+            <h5>
               {{ user.name }}
-            </router-link>
-          </h5>
+            </h5>
+          </router-link>
           <span v-if="user.username">({{ user.username }})</span>
         </div>
         <div
           v-if="
-            user.friends.filter((friend) => friend.userId === userProfile.id)
-              .length === 0
+            user.friends.filter(
+              (friend) =>
+                friend.userId === userProfile.id && friend.status === 'request'
+            ).length === 0
           "
         >
           <a
@@ -67,30 +125,117 @@
     <p v-else>
       There are currently no users.
     </p>
+    <h3 v-if="friendsUsers.length">Friends</h3>
+    <ul v-if="friendsUsers.length">
+      <li v-for="user in friendsUsers" :key="user.id">
+        <router-link class="link-photo" :to="user.id">
+          <img
+            :alt="`${user.name} photo`"
+            :src="
+              user.photo
+                ? user.photo
+                : require(`../assets/images/avatar-placeholder.jpg`)
+            "
+            class="photo"
+          />
+        </router-link>
+        <div class="wrapper">
+          <router-link :to="user.id">
+            <h5>{{ user.name }}</h5>
+          </router-link>
+          <div class="buttons">
+            <button
+              @click="toggleModalVisibility(user.id, user.name)"
+              class="button button--gray"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
   setup() {
     const store = useStore()
+    const modalVisible = ref(false)
+    const selectedUser = ref({})
     const users = computed(() => store.state.users)
     const userProfile = computed(() => store.state.userProfile)
-    const filteredUsers = computed(() =>
+    const allUsers = computed(() =>
       users.value.filter((user) => user.id !== userProfile.value.id)
+    )
+    const requestedUsers = computed(() =>
+      allUsers.value.filter((user) =>
+        user.friends.some(
+          (friend) =>
+            friend.status === 'pending' &&
+            friend.userId === userProfile.value.id
+        )
+      )
+    )
+    const friendsUsers = computed(() =>
+      allUsers.value.filter((user) =>
+        user.friends.some(
+          (friend) =>
+            friend.status === 'accepted' &&
+            friend.userId === userProfile.value.id
+        )
+      )
+    )
+
+    const filteredUsers = computed(() =>
+      allUsers.value.filter(
+        (x) =>
+          !requestedUsers.value.includes(x) && !friendsUsers.value.includes(x)
+      )
     )
 
     function addFriend(userId) {
       store.dispatch('addFriend', userId)
     }
 
+    function removeFriend(userId) {
+      store.dispatch('removeFriend', userId)
+      modalVisible.value = false
+    }
+
+    function acceptFriend(userId) {
+      store.dispatch('acceptFriend', userId)
+    }
+
+    function toggleModalVisibility(userId, userName) {
+      if (userId) {
+        selectedUser.value.id = userId
+      } else {
+        selectedUser.value.id = ''
+      }
+
+      if (userName) {
+        selectedUser.value.name = userName
+      } else {
+        selectedUser.value.name = ''
+      }
+      modalVisible.value = !modalVisible.value
+    }
+
     return {
       userProfile,
       filteredUsers,
-      addFriend
+      requestedUsers,
+      selectedUser,
+      friendsUsers,
+      addFriend,
+      removeFriend,
+      acceptFriend,
+      modalVisible,
+      toggleModalVisibility
     }
   }
 }
@@ -104,8 +249,42 @@ h3 {
   font-size: 17px;
 }
 
+.buttons {
+  display: flex;
+
+  .button {
+    border-radius: 6px;
+    padding: 12px 45px;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    min-width: auto;
+
+    &--primary {
+      background: $primary-button-color;
+
+      &:hover {
+        background: darken($primary-button-color, 5%);
+      }
+    }
+
+    &--gray {
+      background: $secondary-button-background;
+      color: $primary-text;
+
+      &:hover {
+        background: darken($secondary-button-background, 5%);
+      }
+    }
+
+    &:not(:first-child) {
+      margin-left: 10px;
+    }
+  }
+}
+
 .container {
-  h5 a {
+  a h5 {
     color: $primary-text;
     font-size: 15px;
 

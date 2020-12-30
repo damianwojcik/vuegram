@@ -122,6 +122,23 @@ const store = createStore({
         commentsDisabled
       })
     },
+    async removeFriend({ state }, targetUserId) {
+      const currentUserId = state.userProfile.id
+      const currentUserFriends = state.userProfile.friends
+      const targetUser = await fb.usersCollection.doc(targetUserId).get()
+      const targetUserFriends = targetUser.data().friends
+      const filteredTargetUserFriends = targetUserFriends.filter(friend => friend.userId !== currentUserId)
+      const filteredCurrentUserFriends = currentUserFriends.filter(friend => friend.userId !== targetUserId)
+
+      await fb.usersCollection.doc(targetUserId).update({
+        friends: filteredTargetUserFriends
+      })
+
+      await fb.usersCollection.doc(currentUserId).update({
+        friends: filteredCurrentUserFriends
+      })
+
+    },
     async addFriend({ state }, targetUserId) {
       const currentUserId = state.userProfile.id
       const currentUserFriends = state.userProfile.friends
@@ -132,7 +149,7 @@ const store = createStore({
         || currentUserFriends.filter(friend => friend.userId === targetUserId).length > 0) {
         const filteredTargetUserFriends = targetUserFriends.filter(friend => friend.userId !== currentUserId)
         const filteredCurrentUserFriends = currentUserFriends.filter(friend => friend.userId !== targetUserId)
-       
+
         await fb.usersCollection.doc(targetUserId).update({
           friends: filteredTargetUserFriends
         })
@@ -147,16 +164,42 @@ const store = createStore({
       await fb.usersCollection.doc(targetUserId).update({
           friends: [...targetUserFriends, {
             userId: currentUserId,
-            status: 'pending'
+            status: 'request'
           }]
         })
 
-        await fb.usersCollection.doc(currentUserId).update({
-          friends: [...currentUserFriends, {
-            userId: targetUserId,
-            status: 'pending'
-          }]
-        })
+      await fb.usersCollection.doc(currentUserId).update({
+        friends: [...currentUserFriends, {
+          userId: targetUserId,
+          status: 'pending'
+        }]
+      })
+    },
+    async acceptFriend({ state }, targetUserId) {
+      const currentUserId = state.userProfile.id
+      const currentUserFriends = await (await fb.usersCollection.doc(currentUserId).get()).data().friends
+      const targetUser = await fb.usersCollection.doc(targetUserId).get()
+      const targetUserFriends = targetUser.data().friends
+
+      currentUserFriends.forEach(friend => {
+        if (friend.userId === targetUserId) {
+          friend.status = "accepted"
+        }
+      })
+
+      targetUserFriends.forEach(friend => {
+        if (friend.userId === currentUserId) {
+          friend.status = "accepted"
+        }
+      })
+
+      await fb.usersCollection.doc(currentUserId).update({
+        friends: currentUserFriends
+      })
+
+      await fb.usersCollection.doc(targetUserId).update({
+        friends: targetUserFriends
+      })
     },
     async addComment({ state }, { post, comment }) {
       const userId = fb.auth.currentUser.uid
