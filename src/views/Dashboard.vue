@@ -232,29 +232,6 @@ export default {
     }
   }
 
-  .hidden-posts {
-    text-align: center;
-    border: 1px solid #e6ecf0;
-    font-size: 14px;
-    border-bottom: 0;
-    background: $white;
-
-    &:hover {
-      background: #f5f8fa;
-      cursor: pointer;
-    }
-
-    .new-posts {
-      color: $primary;
-    }
-
-    p {
-      padding: 15px;
-      margin: 0 auto;
-      color: darken($light, 25%);
-    }
-  }
-
   .post {
     border: 1px solid #e6ecf0;
     border-bottom: 0;

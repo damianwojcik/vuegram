@@ -211,3 +211,11 @@ textarea {
   padding: 10px;
   font-size: 16px;
 }
+
+.error {
+  color: $error;
+  display: block;
+  margin-bottom: 1rem;
+  position: relative;
+  top: -8px;
+}

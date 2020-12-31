@@ -32,7 +32,8 @@ const store = createStore({
   state: {
     userProfile: {},
     posts: [],
-    users: []
+    users: [],
+    error: null
   },
   mutations: {
     setUserProfile(state, payload) {
@@ -43,12 +44,17 @@ const store = createStore({
     },
     setUsers(state, payload) {
       state.users = payload
+    },
+    setError(state, payload) {
+      state.error = payload
     }
   },
   actions: {
-    async login({ dispatch }, form) {
-      const { user } = await fb.auth.signInWithEmailAndPassword(form.email, form.password)
-      dispatch('fetchUserProfile', user)
+    async login({ commit, dispatch }, form) {
+    commit('setError', null)
+     await fb.auth.signInWithEmailAndPassword(form.email, form.password)
+      .then((user) => dispatch('fetchUserProfile', user))
+      .catch(error => commit('setError', error))
     },
     async fetchUserProfile({ commit }, user) {
       const userProfile = await fb.usersCollection.doc(user.uid).get()
@@ -57,21 +63,31 @@ const store = createStore({
         router.push('/')
       }
     },
-    async signup({ dispatch }, form) {
-      const { user } = await fb.auth.createUserWithEmailAndPassword(form.email, form.password)
-    
-      await fb.usersCollection.doc(user.uid).set({
-        photo: '',
-        username: '',
-        email: form.email,
-        name: form.name,
-        title: '',
-        phone: form.phone,
-        hometown: '',
-        friends: []
-      })
-    
-      dispatch('fetchUserProfile', user)
+    async signup({ commit, dispatch }, form) {
+      commit('setError', null)
+
+      try {
+        const { user } = await fb.auth.createUserWithEmailAndPassword(form.email, form.password)
+
+        try {
+          await fb.usersCollection.doc(user.uid).set({
+            photo: '',
+            username: '',
+            email: form.email,
+            name: form.name,
+            title: '',
+            phone: '',
+            hometown: '',
+            friends: []
+          })
+        
+          dispatch('fetchUserProfile', user)
+        } catch(error) {
+          commit('setError', error)
+        }
+      } catch(error) {
+        commit('setError', error)
+      }
     },
     async logout({ commit }) {
       await fb.auth.signOut()

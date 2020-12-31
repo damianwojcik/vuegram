@@ -1,25 +1,27 @@
 <template>
-  <div v-if="modalVisible" class="modal" @click="toggleModalVisibility()">
-    <div class="modal-content" @click.stop>
-      <div @click="toggleModalVisibility()" class="close">&times;</div>
-      <h3>Delete friend</h3>
-      <p>
-        Do you really want to delete
-        <strong>{{ selectedUser.name }}</strong> from friends?
-      </p>
-      <div class="buttons">
-        <button
-          @click="removeFriend(selectedUser.id)"
-          class="button button--primary"
-        >
-          Delete
-        </button>
-        <button @click="toggleModalVisibility()" class="button button--gray">
-          Cancel
-        </button>
+  <transition name="fade">
+    <div v-if="modalVisible" class="modal" @click="toggleModalVisibility()">
+      <div class="modal-content" @click.stop>
+        <div @click="toggleModalVisibility()" class="close">&times;</div>
+        <h3>Delete friend</h3>
+        <p>
+          Do you really want to delete
+          <strong>{{ selectedUser.name }}</strong> from friends?
+        </p>
+        <div class="buttons">
+          <button
+            @click="removeFriend(selectedUser.id)"
+            class="button button--primary"
+          >
+            Delete
+          </button>
+          <button @click="toggleModalVisibility()" class="button button--gray">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
   <div class="container">
     <h3 v-if="requestedUsers.length">Requests</h3>
     <ul v-if="requestedUsers.length">

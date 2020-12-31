@@ -15,7 +15,12 @@
       <div :class="{ 'signup-form': !showLoginForm }" class="col2">
         <form v-if="showLoginForm" @submit.prevent>
           <h1>Welcome Back</h1>
-          <div>
+          <div
+            class="field"
+            :class="{
+              'field--error': error && error.code === 'auth/user-not-found'
+            }"
+          >
             <label for="email1">Email</label>
             <input
               v-model.trim="loginForm.email"
@@ -23,8 +28,18 @@
               placeholder="you@email.com"
               id="email1"
             />
+            <span
+              class="error"
+              v-if="error && error.code === 'auth/user-not-found'"
+              >{{ error.message }}</span
+            >
           </div>
-          <div>
+          <div
+            class="field"
+            :class="{
+              'field--error': error && error.code === 'auth/wrong-password'
+            }"
+          >
             <label for="password1">Password</label>
             <input
               v-model.trim="loginForm.password"
@@ -32,16 +47,28 @@
               placeholder="******"
               id="password1"
             />
+            <span
+              class="error"
+              v-if="error && error.code === 'auth/wrong-password'"
+              >{{ error.message }}</span
+            >
           </div>
-          <button @click="login()" class="button">Log In</button>
-          <div class="extras">
-            <a @click="togglePasswordReset()">Forgot Password</a>
-            <a @click="toggleForm()">Create an Account</a>
+          <div class="buttons-wrapper">
+            <button @click="login()" class="button">Log In</button>
+            <div class="extras">
+              <a @click="togglePasswordReset()">Forgot Password</a>
+              <a @click="toggleForm()">Create an Account</a>
+            </div>
           </div>
         </form>
-        <form v-else @submit.prevent>
+        <form v-else @submit.prevent="checkForm">
           <h1>Get Started</h1>
-          <div>
+          <div
+            class="field"
+            :class="{
+              'field--error': error && error.code === 'name/required'
+            }"
+          >
             <label for="name">Name</label>
             <input
               v-model.trim="signupForm.name"
@@ -49,17 +76,20 @@
               placeholder="John Doe"
               id="name"
             />
+            <span
+              class="error"
+              v-if="error && error.code === 'name/required'"
+              >{{ error.message }}</span
+            >
           </div>
-          <div>
-            <label for="phone">Phone Number</label>
-            <input
-              v-model.trim="signupForm.phone"
-              type="number"
-              placeholder="123456789"
-              id="phone"
-            />
-          </div>
-          <div>
+          <div
+            class="field"
+            :class="{
+              'field--error':
+                (error && error.code === 'auth/email-already-in-use') ||
+                (error && error.code === 'auth/invalid-email')
+            }"
+          >
             <label for="email2">Email</label>
             <input
               v-model.trim="signupForm.email"
@@ -67,8 +97,21 @@
               placeholder="john@email.com"
               id="email2"
             />
+            <span
+              class="error"
+              v-if="
+                (error && error.code === 'auth/email-already-in-use') ||
+                  (error && error.code === 'auth/invalid-email')
+              "
+              >{{ error.message }}</span
+            >
           </div>
-          <div>
+          <div
+            class="field"
+            :class="{
+              'field--error': error && error.code === 'auth/weak-password'
+            }"
+          >
             <label for="password2">Password</label>
             <input
               v-model.trim="signupForm.password"
@@ -76,10 +119,17 @@
               placeholder="min 6 characters"
               id="password2"
             />
+            <span
+              class="error"
+              v-if="error && error.code === 'auth/weak-password'"
+              >{{ error.message }}</span
+            >
           </div>
-          <button @click="signup()" class="button">Sign Up</button>
-          <div class="extras">
-            <a @click="toggleForm()">Back to Log In</a>
+          <div class="buttons-wrapper">
+            <button class="button">Sign Up</button>
+            <div class="extras">
+              <a @click="toggleForm()">Back to Log In</a>
+            </div>
           </div>
         </form>
       </div>
@@ -88,7 +138,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import PasswordReset from '@/components/PasswordReset'
 
@@ -99,9 +149,10 @@ export default {
   setup() {
     const store = useStore()
     const loginForm = ref({ email: '', password: '' })
-    const signupForm = ref({ name: '', phone: '', email: '', password: '' })
+    const signupForm = ref({ name: '', email: '', password: '' })
     const showLoginForm = ref(true)
     const showPasswordReset = ref(false)
+    const error = computed(() => store.state.error)
 
     function toggleForm() {
       showLoginForm.value = !showLoginForm.value
@@ -122,9 +173,22 @@ export default {
       store.dispatch('signup', {
         email: signupForm.value.email,
         password: signupForm.value.password,
-        name: signupForm.value.name,
-        phone: signupForm.value.phone
+        name: signupForm.value.name
       })
+    }
+
+    function checkForm() {
+      // fields validation
+      if (!signupForm.value.name) {
+        store.commit('setError', {
+          code: 'name/required',
+          message: 'Name is required.'
+        })
+      } else {
+        store.commit('setError', null)
+        signup()
+        return true
+      }
     }
 
     return {
@@ -135,7 +199,9 @@ export default {
       toggleForm,
       togglePasswordReset,
       login,
-      signup
+      signup,
+      error,
+      checkForm
     }
   }
 }
@@ -211,6 +277,24 @@ export default {
         display: block;
         margin-bottom: 0.5rem;
       }
+    }
+  }
+}
+
+.buttons-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.field {
+  margin-bottom: 1rem;
+
+  &--error {
+    color: $error;
+
+    input {
+      border-color: $error;
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <section class="container settings">
+  <div class="container settings">
     <div class="col1">
       <h3>Settings</h3>
       <p>Update your profile</p>
@@ -97,7 +97,7 @@
         </button>
       </form>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -206,6 +206,7 @@ export default {
 
 .settings {
   background: $white;
+  display: flex;
 
   .avatar {
     display: inline-block;
