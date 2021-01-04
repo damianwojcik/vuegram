@@ -38,6 +38,16 @@ const routes = [
     component: () => import(/* webpackChunkName: "user" */ '../views/User.vue'),
     meta: {
       requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      const currentUserId = auth.currentUser.uid;
+      const toPath = to.path.replace(/\//g, "")
+      
+      if (toPath === currentUserId) {
+        next('/')
+      } else {
+        next()
+      }
     }
   },
 ]
