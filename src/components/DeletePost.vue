@@ -3,12 +3,28 @@
     <transition name="fade">
       <div class="modal" v-if="isModalVisible" @click="toggleModal">
         <div class="modal-content" @click.stop>
-          <div @click="toggleModal" class="close">&times;</div>
+          <div @click="toggleModal" class="close">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="#000"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
           <h3>Do you really want to delete this post?</h3>
           <ul class="buttons">
-            <li><button class="button" @click="toggleModal">No</button></li>
             <li>
-              <button class="button button--error" @click="deletePost(postId)">
+              <button class="button button--gray" @click="toggleModal">
+                No
+              </button>
+            </li>
+            <li>
+              <button class="button" @click="deletePost(postId)">
                 Yes
               </button>
             </li>
@@ -103,19 +119,6 @@ export default {
     padding: 0;
     list-style: none;
     justify-content: space-between;
-  }
-
-  .close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 5px;
-    cursor: pointer;
-    transition: 0.15s;
-
-    &:hover {
-      color: #000;
-    }
   }
 }
 </style>

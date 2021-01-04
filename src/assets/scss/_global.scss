@@ -130,33 +130,80 @@ section {
 }
 
 .button {
-  background: $primary;
-  border: 0;
+  border-radius: 6px;
+  padding: 12px 45px;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  min-width: auto;
   outline: 0;
-  color: $white;
-  padding: 0.8rem 1rem;
-  min-width: 150px;
-  font-size: 16px;
-  border-radius: 3px;
+  border: 0;
   cursor: pointer;
+  background: $primary-button-color;
+  color: $white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  &:hover {
-    background: lighten($primary, 5%);
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: $white;
+    margin-right: 5px;
   }
 
-  &:disabled {
+  &:hover {
+    background: darken($primary-button-color, 5%);
+    color: $white;
+  }
+
+  &:disabled,
+  &[disabled] {
     opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--gray {
+    background: $secondary-button-background;
+    color: $primary-text;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: $black;
+    }
 
     &:hover {
-      background: $primary;
+      background: darken($secondary-button-background, 5%);
     }
   }
 
-  &--error {
-    background: $error;
+  &--light {
+    background: $primary-button-background;
+    color: $primary;
 
     &:hover {
-      background: darken($error, 10%);
+      background: darken($primary-button-background, 5%);
+      color: $primary;
+    }
+
+    svg {
+      fill: $primary;
+    }
+  }
+
+  &--circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    z-index: 9;
+    padding: 3px;
+
+    svg {
+      margin: 0;
     }
   }
 }

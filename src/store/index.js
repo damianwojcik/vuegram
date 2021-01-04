@@ -58,7 +58,7 @@ const store = createStore({
     },
     async fetchUserProfile({ commit }, user) {
       const userProfile = await fb.usersCollection.doc(user.uid).get()
-      commit('setUserProfile', { id:user.uid, ...userProfile.data()})
+      commit('setUserProfile', { id: user.uid, ...userProfile.data()})
       if (router.currentRoute.value.path === '/login') {
         router.push('/')
       }
@@ -153,7 +153,6 @@ const store = createStore({
       await fb.usersCollection.doc(currentUserId).update({
         friends: filteredCurrentUserFriends
       })
-
     },
     async addFriend({ state }, targetUserId) {
       const currentUserId = state.userProfile.id

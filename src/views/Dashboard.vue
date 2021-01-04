@@ -35,7 +35,7 @@
                 :getUserData="getUserData"
               ></FullPost>
             </transition>
-            <div class="row">
+            <router-link :to="post.userId" class="row">
               <img
                 class="post__avatar"
                 :alt="`${getUserData(post).userName} photo`"
@@ -52,7 +52,7 @@
                     : post.userName
                 }}
               </h5>
-            </div>
+            </router-link>
             <span>{{ formatDate(post.createdOn) }}</span>
             <p>{{ trimmContent(post.content) }}</p>
             <ul>
@@ -243,6 +243,12 @@ export default {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
+      color: $primary-text;
+      font-size: 15px;
+
+      &:hover {
+        text-decoration: underline;
+      }
 
       h5 {
         margin: 0 0 0 10px;

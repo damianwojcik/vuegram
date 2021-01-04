@@ -2,17 +2,26 @@
   <transition name="fade">
     <div v-if="modalVisible" class="modal" @click="toggleModalVisibility()">
       <div class="modal-content" @click.stop>
-        <div @click="toggleModalVisibility()" class="close">&times;</div>
+        <div @click="toggleModalVisibility()" class="close">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="#000"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
         <h3>Delete friend</h3>
         <p>
           Do you really want to delete
           <strong>{{ selectedUser.name }}</strong> from friends?
         </p>
         <div class="buttons">
-          <button
-            @click="removeFriend(selectedUser.id)"
-            class="button button--primary"
-          >
+          <button @click="removeFriend(selectedUser.id)" class="button">
             Delete
           </button>
           <button @click="toggleModalVisibility()" class="button button--gray">
@@ -42,10 +51,7 @@
             <h5>{{ user.name }}</h5>
           </router-link>
           <div class="buttons">
-            <button
-              @click="acceptFriend(user.id)"
-              class="button button--primary"
-            >
+            <button @click="acceptFriend(user.id)" class="button">
               Accept
             </button>
             <button
@@ -90,7 +96,7 @@
         >
           <a
             @click="addFriend(user.id)"
-            class="user-button"
+            class="button button--gray button--circle"
             title="Add user to friends"
           >
             <svg
@@ -108,7 +114,7 @@
           <!-- TODO: add hover tooltip -->
           <a
             @click="addFriend(user.id)"
-            class="user-button user-pending"
+            class="button button--light button--circle"
             title="Cancel request to friends"
           >
             <svg
@@ -247,7 +253,6 @@ export default {
 @import '../assets/scss/variables';
 
 h3 {
-  padding: 16px 16px 16px 0;
   font-size: 17px;
 }
 
@@ -255,30 +260,6 @@ h3 {
   display: flex;
 
   .button {
-    border-radius: 6px;
-    padding: 12px 45px;
-    font-size: 12px;
-    line-height: 1;
-    font-weight: 600;
-    min-width: auto;
-
-    &--primary {
-      background: $primary-button-color;
-
-      &:hover {
-        background: darken($primary-button-color, 5%);
-      }
-    }
-
-    &--gray {
-      background: $secondary-button-background;
-      color: $primary-text;
-
-      &:hover {
-        background: darken($secondary-button-background, 5%);
-      }
-    }
-
     &:not(:first-child) {
       margin-left: 10px;
     }
@@ -334,6 +315,10 @@ h3 {
     margin: 0;
     padding: 0;
 
+    &:not(:last-child) {
+      margin-bottom: 30px;
+    }
+
     li {
       position: relative;
       display: flex;
@@ -349,40 +334,6 @@ h3 {
         height: 60px;
         border-radius: 50%;
         margin-right: 12px;
-      }
-
-      svg {
-        width: 20px;
-        height: 20px;
-        fill: $black;
-      }
-
-      .user-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50%;
-        width: 36px;
-        height: 36px;
-        z-index: 9;
-        padding: 3px;
-        background: $secondary-button-background;
-
-        &:hover {
-          background: darken($secondary-button-background, 10%);
-        }
-
-        &.user-pending {
-          background: $primary-button-background;
-
-          &:hover {
-            background: darken($primary-button-background, 5%);
-          }
-
-          svg {
-            fill: $primary;
-          }
-        }
       }
     }
   }

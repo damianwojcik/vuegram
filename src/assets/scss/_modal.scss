@@ -27,17 +27,26 @@
       cursor: pointer;
       transition: 0.15s;
 
+      svg {
+        width: 20px;
+        height: 20px;
+        fill: $black;
+      }
+
       &:hover {
         color: #000;
+        svg {
+          fill: rgba(0, 0, 0, 0.5);
+        }
       }
     }
 
     h3 {
-      margin: 0;
+      margin: 0 0 20px 0;
     }
 
     p {
-      margin: 15px 0;
+      margin: 0 0 20px 0;
     }
 
     .error {
