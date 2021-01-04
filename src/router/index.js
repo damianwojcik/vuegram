@@ -1,8 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import NotFound from '../views/NotFound.vue'
 import Dashboard from '../views/Dashboard.vue'
 import { auth } from '../firebase'
 
 const routes = [
+  {
+    path: '/404', name: 'NotFound', component: NotFound
+  },
+  {
+    path: '/:catchAll(.*)', redirect:'404'
+  },
   {
     path: '/',
     name: 'Dashboard',

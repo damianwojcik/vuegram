@@ -115,13 +115,14 @@
 
 <script>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import moment from 'moment'
 
 export default {
   setup() {
     const store = useStore()
+    const router = useRouter()
     const route = useRoute()
     const posts = computed(() => store.state.posts)
     const users = computed(() => store.state.users)
@@ -142,6 +143,10 @@ export default {
           )
         : false
     )
+
+    if (!user.value) {
+      router.push('/404')
+    }
 
     function getUserData(post) {
       const user = users.value.filter((user) => user.id === post.userId)[0]
