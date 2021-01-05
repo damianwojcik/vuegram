@@ -24,8 +24,8 @@
         </div>
       </div>
       <div class="col2">
-        <div v-if="posts.length">
-          <div v-for="post in posts" :key="post.id" class="post">
+        <div v-if="filteredPosts.length">
+          <div v-for="post in filteredPosts" :key="post.id" class="post">
             <transition name="fade">
               <FullPost
                 v-if="showPostModal === post.id"
@@ -123,8 +123,25 @@ export default {
     const userProfile = computed(() => store.state.userProfile)
     const posts = computed(() => store.state.posts)
     const users = computed(() => store.state.users)
+    const currentUser = computed(() =>
+      users.value.filter((user) => user.id === userProfile.value.id)
+    )
     const showCommentModal = ref(false)
     const showPostModal = ref('')
+    const currentUserFriends = computed(() =>
+      currentUser.value[0]
+        ? currentUser.value[0].friends.map((element) =>
+            element.status === 'accepted' ? element.userId : ''
+          )
+        : []
+    )
+    const filteredPosts = computed(() =>
+      posts.value.filter(
+        (post) =>
+          post.userId === userProfile.value.id ||
+          currentUserFriends.value.some((friend) => friend === post.userId)
+      )
+    )
 
     function formatDate(val) {
       if (!val) {
@@ -169,7 +186,7 @@ export default {
 
     return {
       userProfile,
-      posts,
+      filteredPosts,
       users,
       formatDate,
       trimmContent,
