@@ -31,6 +31,9 @@
               />
             </svg>
             <span>Users</span>
+            <span class="request-count" v-if="currentUserRequests.length > 0">{{
+              currentUserRequests.length
+            }}</span>
           </router-link>
         </li>
         <li>
@@ -75,18 +78,34 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
   setup() {
     const store = useStore()
+    const userProfile = computed(() => store.state.userProfile)
+    const users = computed(() => store.state.users)
+    const currentUser = computed(() =>
+      users.value.filter((user) => user.id === userProfile.value.id)
+    )
+    const currentUserRequests = computed(() =>
+      currentUser.value[0]
+        ? currentUser.value[0].friends
+            .map((element) =>
+              element.status === 'request' ? element.userId : null
+            )
+            .filter((element) => !!element)
+        : []
+    )
 
     function logout() {
       store.dispatch('logout')
     }
 
     return {
-      logout
+      logout,
+      currentUserRequests
     }
   }
 }
@@ -117,6 +136,7 @@ header {
     display: flex;
 
     li {
+      position: relative;
       display: inline-flex;
       align-items: center;
       margin-top: 4px;
@@ -144,5 +164,22 @@ header {
       text-align: center;
     }
   }
+}
+.request-count {
+  display: flex;
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: bold;
+  color: $white;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+  background: red;
+  margin: 0;
 }
 </style>

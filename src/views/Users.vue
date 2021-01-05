@@ -54,10 +54,7 @@
             <button @click="acceptFriend(user.id)" class="button">
               Accept
             </button>
-            <button
-              @click="toggleModalVisibility(user.id, user.name)"
-              class="button button--gray"
-            >
+            <button @click="removeFriend(user.id)" class="button button--gray">
               Delete
             </button>
           </div>
