@@ -1,0 +1,7 @@
+.tooltip-wrap {
+  position: relative;
+
+  &:hover .tooltip {
+    opacity: 1;
+  }
+}

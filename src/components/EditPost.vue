@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-post">
+  <div class="edit-post tooltip-wrap">
     <transition name="fade">
       <div class="modal" v-if="isModalVisible" @click="toggleModal">
         <div class="modal-content" @click.stop>
@@ -46,21 +46,26 @@
         </div>
       </div>
     </transition>
-    <a title="Edit post" @click="toggleModal">
+    <a @click="toggleModal">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#000">
         <path
           d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
         />
       </svg>
     </a>
+    <Tooltip :msg="'Edit post'" />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import { useStore } from 'vuex'
+import Tooltip from '@/components/Tooltip'
 
 export default {
+  components: {
+    Tooltip
+  },
   props: {
     post: Object
   },

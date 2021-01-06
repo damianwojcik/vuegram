@@ -58,6 +58,7 @@
             </div>
             <div class="know-friends__button-wrap">
               <div
+                class="tooltip-wrap"
                 v-if="
                   user.friends.filter(
                     (friend) =>
@@ -66,11 +67,8 @@
                   ).length === 0
                 "
               >
-                <a
-                  @click="addFriend(user.id)"
-                  class="button"
-                  title="Add user to friends"
-                >
+                <Tooltip :msg="'Add friend'" />
+                <a @click="addFriend(user.id)" class="button">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
@@ -83,13 +81,9 @@
                   Add Friend
                 </a>
               </div>
-              <div v-else>
-                <!-- TODO: add hover tooltip -->
-                <a
-                  @click="addFriend(user.id)"
-                  class="button button--light"
-                  title="Cancel request to friends"
-                >
+              <div class="tooltip-wrap" v-else>
+                <Tooltip :msg="'Cancel friend request'" />
+                <a @click="addFriend(user.id)" class="button button--light">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
@@ -118,8 +112,12 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import moment from 'moment'
+import Tooltip from '@/components/Tooltip'
 
 export default {
+  components: {
+    Tooltip
+  },
   setup() {
     const store = useStore()
     const router = useRouter()

@@ -257,7 +257,7 @@ export default {
     background: $white;
 
     .row {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       margin-bottom: 10px;
       color: $primary-text;

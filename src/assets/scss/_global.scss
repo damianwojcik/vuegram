@@ -15,8 +15,9 @@ html {
 
 * {
   font-family: 'Open Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
-  transition: 0.15s;
 
   &:focus {
     outline: none;
@@ -175,6 +176,7 @@ section {
 
     &:hover {
       background: darken($secondary-button-background, 5%);
+      color: $primary-text;
     }
   }
 
