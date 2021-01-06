@@ -3,23 +3,7 @@
     <section>
       <div class="col1">
         <div class="wrapper">
-          <div class="profile">
-            <div class="text-center">
-              <img
-                class="profile__avatar"
-                :alt="`${userProfile.name} photo`"
-                :src="
-                  userProfile.photo
-                    ? userProfile.photo
-                    : require(`../assets/images/avatar-placeholder.jpg`)
-                "
-              />
-            </div>
-            <h5>{{ userProfile.name }}</h5>
-            <h4 v-if="userProfile.username">({{ userProfile.username }})</h4>
-            <p v-if="userProfile.title">{{ userProfile.title }}</p>
-            <span v-if="userProfile.hometown">{{ userProfile.hometown }}</span>
-          </div>
+          <Profile :user="userProfile" />
           <CreatePost />
         </div>
       </div>
@@ -100,6 +84,7 @@
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import moment from 'moment'
+import Profile from '@/components/Profile'
 import CreatePost from '@/components/CreatePost'
 import CommentModal from '@/components/CommentModal'
 import CommentsList from '@/components/CommentsList'
@@ -110,6 +95,7 @@ import EditPost from '@/components/EditPost'
 
 export default {
   components: {
+    Profile,
     CreatePost,
     CommentModal,
     FullPost,
@@ -220,33 +206,6 @@ export default {
   .wrapper {
     background: $white;
     padding: 2rem;
-  }
-
-  .profile {
-    border-bottom: 1px solid #e6ecf0;
-    margin-bottom: 20px;
-    padding-bottom: 1rem;
-
-    &__avatar {
-      display: inline-block;
-      margin-bottom: 20px;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-    }
-
-    h4 {
-      font-size: 0.8rem;
-    }
-
-    p {
-      color: $medium;
-    }
-
-    span {
-      font-size: 15px;
-      color: $secondary-text;
-    }
   }
 
   .post {

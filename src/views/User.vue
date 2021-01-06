@@ -3,24 +3,7 @@
     <section>
       <div class="col1">
         <div class="wrapper">
-          <div class="profile" v-if="user">
-            <div class="text-center">
-              <img
-                class="profile__avatar"
-                :alt="`${user.name} photo`"
-                :src="
-                  user.photo
-                    ? user.photo
-                    : require(`../assets/images/avatar-placeholder.jpg`)
-                "
-              />
-            </div>
-            <h5>{{ user.name }}</h5>
-            <h4 v-if="user.username">({{ user.username }})</h4>
-            <p v-if="user.title">{{ user.title }}</p>
-            <span v-if="user.hometown">{{ user.hometown }}</span>
-            <a :href="'mailto: ' + user.email">{{ user.email }}</a>
-          </div>
+          <Profile :user="user" />
         </div>
       </div>
       <div class="col2">
@@ -112,10 +95,12 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import moment from 'moment'
+import Profile from '@/components/Profile'
 import Tooltip from '@/components/Tooltip'
 
 export default {
   components: {
+    Profile,
     Tooltip
   },
   setup() {
@@ -212,31 +197,6 @@ export default {
   .wrapper {
     background: $white;
     padding: 2rem;
-  }
-
-  .profile {
-    margin-bottom: 20px;
-
-    &__avatar {
-      display: inline-block;
-      margin-bottom: 20px;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-    }
-
-    h4 {
-      font-size: 0.8rem;
-    }
-
-    p {
-      color: $medium;
-    }
-
-    span {
-      font-size: 15px;
-      color: $secondary-text;
-    }
   }
 }
 
