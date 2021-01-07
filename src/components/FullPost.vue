@@ -132,9 +132,6 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/scss/variables';
 
-#dashboard .post span.liked {
-  color: red;
-}
 .post {
   border: 1px solid #e6ecf0;
   border-bottom: 0;
@@ -172,7 +169,6 @@ export default {
     display: block;
     font-style: italic;
     font-size: 12px;
-    margin-bottom: 0.5rem;
     color: darken($light, 25%);
   }
 
@@ -184,6 +180,8 @@ export default {
     list-style: none;
     margin: 1rem 0 0;
     padding: 0;
+    display: flex;
+    align-items: center;
 
     li {
       display: inline-block;
@@ -215,7 +213,6 @@ export default {
     display: block;
     font-style: italic;
     font-size: 12px;
-    margin-bottom: 0.5rem;
     color: darken($light, 25%);
   }
 }
@@ -230,14 +227,7 @@ export default {
   right: 2rem;
   top: 2rem;
 
-  svg {
-    width: 20px;
-    height: 20px;
-    fill: $black;
-  }
-
   &:hover {
-    color: #000;
     svg {
       fill: rgba(0, 0, 0, 0.5);
     }
@@ -288,14 +278,7 @@ export default {
       right: 20px;
       padding: 5px;
 
-      svg {
-        width: 20px;
-        height: 20px;
-        fill: $black;
-      }
-
       &:hover {
-        color: #000;
         svg {
           fill: rgba(0, 0, 0, 0.5);
         }

@@ -112,7 +112,6 @@ export default {
   position: relative;
   width: 20px;
   height: 20px;
-  top: 5px;
 
   svg {
     fill: $primary;

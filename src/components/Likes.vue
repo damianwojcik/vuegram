@@ -1,9 +1,15 @@
 <template>
   <div class="likes">
     <a @click="likePost(post.id)">
-      <span v-bind:class="[post.likes.includes(userProfile.id) ? 'liked' : '']"
-        >❤</span
-      >
+      <span v-bind:class="[post.likes.includes(userProfile.id) ? 'liked' : '']">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#000">
+          <path
+            fill-rule="evenodd"
+            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </span>
     </a>
     <div class="counter">
       <span v-if="post.likes.length === 0"> {{ post.likes.length }} likes</span>
@@ -89,21 +95,27 @@ export default {
 .likes {
   position: relative;
   display: inline-flex;
+  align-items: center;
 
   span {
     display: block;
     font-style: italic;
     font-size: 12px;
-    margin-bottom: 0.5rem;
     color: darken($light, 25%);
-  }
 
-  span.liked {
-    color: red;
+    svg {
+      fill: darken($light, 25%);
+    }
+
+    &.liked {
+      svg {
+        fill: red;
+      }
+    }
   }
 
   .counter {
-    margin-left: 0.5rem;
+    margin-left: 5px;
   }
 
   .likesModal {
@@ -134,14 +146,7 @@ export default {
       right: 2rem;
       top: 2rem;
 
-      svg {
-        width: 20px;
-        height: 20px;
-        fill: $black;
-      }
-
       &:hover {
-        color: #000;
         svg {
           fill: rgba(0, 0, 0, 0.5);
         }

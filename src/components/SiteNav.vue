@@ -126,8 +126,6 @@ header {
 
   svg {
     fill: $primary;
-    width: 20px;
-    height: 20px;
   }
 
   ul {
@@ -144,7 +142,14 @@ header {
 
       a {
         display: inline-flex;
+        align-items: center;
         padding: 5px;
+        transition: background 0.15s ease;
+
+        &:hover {
+          background: $primary-button-background;
+          border-radius: 8px;
+        }
 
         span {
           margin-left: 5px;

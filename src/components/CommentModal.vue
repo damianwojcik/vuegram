@@ -78,14 +78,7 @@ textarea {
   margin-bottom: 20px;
 }
 .close {
-  svg {
-    width: 20px;
-    height: 20px;
-    fill: $black;
-  }
-
   &:hover {
-    color: #000;
     svg {
       fill: rgba(0, 0, 0, 0.5);
     }

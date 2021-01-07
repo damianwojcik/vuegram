@@ -27,14 +27,7 @@
       cursor: pointer;
       transition: 0.15s;
 
-      svg {
-        width: 20px;
-        height: 20px;
-        fill: $black;
-      }
-
       &:hover {
-        color: #000;
         svg {
           fill: rgba(0, 0, 0, 0.5);
         }
