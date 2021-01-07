@@ -266,6 +266,8 @@ export default {
       list-style: none;
       margin: 1rem 0 0;
       padding: 0;
+      display: flex;
+      align-items: center;
 
       li {
         display: inline-block;
