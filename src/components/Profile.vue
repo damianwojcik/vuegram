@@ -50,6 +50,8 @@ export default {
   span {
     font-size: 15px;
     color: $secondary-text;
+    display: block;
+    margin-bottom: 10px;
   }
 }
 </style>
