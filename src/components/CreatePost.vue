@@ -2,29 +2,30 @@
   <div class="create-post">
     <h3>Create a post</h3>
     <form @submit.prevent>
-      <label for="content">Content</label>
       <textarea
         id="content"
         name="content"
         v-model.trim="newPost.content"
       ></textarea>
-      <div class="checkbox-wrapper">
-        <input
-          type="checkbox"
-          id="commentsDisabled"
-          name="commentsDisabled"
-          v-model="commentsDisabled"
-          @click="!commentsDisabled"
-        />
-        <label for="commentsDisabled">Disable comments</label>
-      </div>
-      <button
-        @click="createPost()"
-        :disabled="newPost.content === ''"
-        class="button"
-      >
-        Post
-      </button>
+      <footer>
+        <button
+          @click="createPost()"
+          :disabled="newPost.content === ''"
+          class="button"
+        >
+          Post
+        </button>
+        <div class="checkbox-wrapper">
+          <input
+            type="checkbox"
+            id="commentsDisabled"
+            name="commentsDisabled"
+            v-model="commentsDisabled"
+            @click="!commentsDisabled"
+          />
+          <label for="commentsDisabled">Disable comments</label>
+        </div>
+      </footer>
     </form>
   </div>
 </template>
@@ -58,39 +59,49 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../assets/scss/variables';
+
 .create-post {
-  h3 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+  background: $white;
+  padding: 1.5rem;
+
+  &:hover {
+    background: $light;
   }
 
-  p {
-    margin-bottom: 0.5rem;
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
   }
 
   .checkbox-wrapper {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    margin-left: 20px;
 
     input {
-      margin-right: 10px;
+      margin-right: 5px;
     }
 
     label {
       margin: 0;
+      font-size: 14px;
     }
   }
 
   textarea {
-    height: 200px;
+    height: 100px;
     margin: 0 0 15px 0;
   }
 
   .button {
-    margin-top: 1rem;
-    width: 100%;
-    z-index: 5;
-    border-radius: 0 0 3px 3px;
+    display: inline-flex;
   }
 }
 </style>

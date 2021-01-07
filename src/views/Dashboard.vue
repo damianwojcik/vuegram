@@ -1,38 +1,38 @@
 <template>
+  <transition name="fade">
+    <FullPost
+      v-if="selectedPostId"
+      :postId="selectedPostId"
+      :formatDate="formatDate"
+      :getUserData="getUserData"
+      :close="closePostModal"
+    ></FullPost>
+  </transition>
   <div class="dashboard">
     <section>
       <div class="col1">
         <div class="wrapper">
           <Profile :user="userProfile" />
-          <CreatePost />
         </div>
       </div>
       <div class="col2">
+        <CreatePost />
         <div v-if="filteredPosts.length">
           <div v-for="post in filteredPosts" :key="post.id" class="post">
-            <transition name="fade">
-              <FullPost
-                v-if="showPostModal === post.id"
-                :post="post"
-                :formatDate="formatDate"
-                :close="togglePostModal"
-                :getUserData="getUserData"
-              ></FullPost>
-            </transition>
             <router-link :to="post.userId" class="row">
               <img
                 class="post__avatar"
-                :alt="`${getUserData(post).userName} photo`"
+                :alt="`${getUserData(post.id).userName} photo`"
                 :src="
-                  getUserData(post).userPhoto
-                    ? getUserData(post).userPhoto
+                  getUserData(post.id).userPhoto
+                    ? getUserData(post.id).userPhoto
                     : require(`../assets/images/avatar-placeholder.jpg`)
                 "
               />
               <h5>
                 {{
-                  getUserData(post).userUsername
-                    ? getUserData(post).userUsername
+                  getUserData(post.id).userUsername
+                    ? getUserData(post.id).userUsername
                     : post.userName
                 }}
               </h5>
@@ -51,7 +51,7 @@
               <li v-else>
                 <span>Comments disabled</span>
               </li>
-              <li><a @click="togglePostModal(post)">view full post</a></li>
+              <li><a @click="selectPost(post.id)">view full post</a></li>
               <li class="user-options" v-if="post.userId === userProfile.id">
                 <EditPost :post="post" />
                 <DeletePost :postId="post.id" />
@@ -113,7 +113,7 @@ export default {
       users.value.filter((user) => user.id === userProfile.value.id)
     )
     const showCommentModal = ref(false)
-    const showPostModal = ref('')
+    const selectedPostId = ref('')
     const currentUserFriends = computed(() =>
       currentUser.value[0]
         ? currentUser.value[0].friends.map((element) =>
@@ -149,15 +149,19 @@ export default {
       post.visibleComments = !post.visibleComments
     }
 
-    function togglePostModal(post) {
-      showPostModal.value = post.id
+    function selectPost(postId) {
+      selectedPostId.value = postId
     }
 
     function closePostModal() {
-      showPostModal.value = false
+      selectedPostId.value = ''
     }
 
-    function getUserData(post) {
+    function getUserData(postId) {
+      if (!postId) {
+        return ''
+      }
+      const post = posts.value.filter((post) => post.id === postId)[0]
       const user = users.value.filter((user) => user.id === post.userId)[0]
       const userUsername = user && user.username ? user.username : ''
       const userName = user && user.name ? user.name : ''
@@ -174,13 +178,13 @@ export default {
       userProfile,
       filteredPosts,
       users,
+      selectedPostId,
       formatDate,
       trimmContent,
       toggleCommentModal,
-      togglePostModal,
+      selectPost,
       closePostModal,
       showCommentModal,
-      showPostModal,
       getUserData
     }
   }

@@ -1,70 +1,64 @@
 <template>
-  <transition name="fade">
-    <div class="p-modal" @click="close(post.id)">
-      <div class="p-container" @click.stop>
-        <a @click="close(post.id)" class="close">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="#000"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </a>
-        <div class="post">
-          <div class="row">
-            <img
-              class="post__avatar"
-              :alt="`${getUserData(post).userName} photo`"
-              :src="
-                getUserData(post).userPhoto
-                  ? getUserData(post).userPhoto
-                  : require(`../assets/images/avatar-placeholder.jpg`)
-              "
-            />
-            <h5>{{ post.userName }}</h5>
-          </div>
-          <span>{{ formatDate(post.createdOn) }}</span>
-          <p>{{ post.content }}</p>
-          <ul>
-            <li>
-              <Likes :post="post" />
-            </li>
-            <li v-if="!post.commentsDisabled">
-              <span>{{ post.comments.length }}&nbsp;comments&nbsp;</span>
-            </li>
-            <li v-if="!post.commentsDisabled">
-              <a @click="toggleCommentModal(post)">add comment</a>
-            </li>
-            <li v-else>
-              <span>Comments disabled</span>
-            </li>
-            <li class="user-options" v-if="post.userId === userProfile.id">
-              <EditPost :post="post" />
-              <DeletePost :postId="post.id" />
-            </li>
-          </ul>
-          <transition name="fade">
-            <CommentModal
-              v-if="showCommentModal"
-              :post="post"
-              :toggle="toggleCommentModal"
-              :showCommentModal="showCommentModal"
-            ></CommentModal>
-          </transition>
+  <div class="p-modal" @click="close()" v-if="post">
+    <div class="p-container" @click.stop>
+      <a @click="close()" class="close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#000">
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </a>
+      <div class="post">
+        <div class="row">
+          <img
+            class="post__avatar"
+            :alt="`${getUserData(post.id).userName} photo`"
+            :src="
+              getUserData(post.id).userPhoto
+                ? getUserData(post.id).userPhoto
+                : require(`../assets/images/avatar-placeholder.jpg`)
+            "
+          />
+          <h5>{{ post.userName }}</h5>
         </div>
-        <CommentsList
-          v-if="post.comments.length && !post.commentsDisabled"
-          :postComments="post.comments"
-          :formatDate="formatDate"
-        />
+        <span>{{ formatDate(post.createdOn) }}</span>
+        <p>{{ post.content }}</p>
+        <ul>
+          <li>
+            <Likes :post="post" />
+          </li>
+          <li v-if="!post.commentsDisabled">
+            <span>{{ post.comments.length }}&nbsp;comments&nbsp;</span>
+          </li>
+          <li v-if="!post.commentsDisabled">
+            <a @click="toggleCommentModal(post)">add comment</a>
+          </li>
+          <li v-else>
+            <span>Comments disabled</span>
+          </li>
+          <li class="user-options" v-if="post.userId === userProfile.id">
+            <EditPost :post="post" />
+            <DeletePost :postId="post.id" />
+          </li>
+        </ul>
+        <transition name="fade">
+          <CommentModal
+            v-if="showCommentModal"
+            :post="post"
+            :toggle="toggleCommentModal"
+            :showCommentModal="showCommentModal"
+          ></CommentModal>
+        </transition>
       </div>
+      <CommentsList
+        v-if="post.comments.length && !post.commentsDisabled"
+        :postComments="post.comments"
+        :formatDate="formatDate"
+      />
     </div>
-  </transition>
+  </div>
 </template>
 
 <script>
@@ -79,9 +73,8 @@ import EditPost from '@/components/EditPost'
 
 export default {
   props: {
-    post: Object,
+    postId: String,
     formatDate: Function,
-    likePost: Function,
     close: Function,
     getUserData: Function
   },
@@ -92,12 +85,16 @@ export default {
     DeletePost,
     EditPost
   },
-  setup() {
+  setup(props) {
     const store = useStore()
+    const posts = computed(() => store.state.posts)
     const userProfile = computed(() => store.state.userProfile)
     const showLikesInnerModal = ref(false)
     const likesUsers = ref([])
     const showCommentModal = ref(false)
+    const post = computed(
+      () => posts.value.filter((post) => post.id === props.postId)[0]
+    )
 
     function toggleLikesInnerModal(likes) {
       showLikesInnerModal.value = !showLikesInnerModal.value
@@ -119,6 +116,7 @@ export default {
     }
 
     return {
+      post,
       userProfile,
       toggleLikesInnerModal,
       closeLikesInnerModal,
