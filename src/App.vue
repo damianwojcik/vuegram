@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <SiteNav v-if="Object.keys(userProfile).length > 1"></SiteNav>
-    <router-view />
+    <router-view :key="$route.path" />
   </div>
 </template>
 

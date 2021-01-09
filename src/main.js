@@ -12,6 +12,8 @@ auth.onAuthStateChanged((user) => {
   }
 
   if(user) {
+    store.dispatch('fetchUsers')
+    store.dispatch('fetchPosts')
     localStorage.setItem('user', user.uid)
     store.dispatch('fetchUserProfile', user)
   } else {

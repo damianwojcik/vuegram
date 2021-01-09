@@ -42,7 +42,7 @@ const routes = [
   {
     path: '/:userId',
     name: 'User',
-    component: () => import(/* webpackChunkName: "user" */ '../views/User.vue'),
+    component: () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue'),
     meta: {
       requiresAuth: true
     },

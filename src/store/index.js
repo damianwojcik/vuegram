@@ -2,32 +2,6 @@ import { createStore } from 'vuex'
 import * as fb from '../firebase'
 import router from '../router/index'
 
-fb.postsCollection.orderBy('createdOn', 'desc').onSnapshot(snapshot => {
-  let postsArray = []
-
-  snapshot.forEach(doc => {
-    let post = doc.data()
-    post.id = doc.id
-
-    postsArray.push(post)
-  })
-
-  store.commit('setPosts', postsArray)
-})
-
-fb.usersCollection.onSnapshot(snapshot => {
-  let usersArray = [];
-
-  snapshot.forEach(doc => {
-    let user = doc.data()
-    user.id = doc.id
-
-    usersArray.push(user)
-  })
-
-  store.commit('setUsers', usersArray)
-})
-
 const store = createStore({
   state: {
     userProfile: {},
@@ -50,6 +24,34 @@ const store = createStore({
     }
   },
   actions: {
+    fetchPosts({ commit }) {
+      fb.postsCollection.orderBy('createdOn', 'desc').onSnapshot(snapshot => {
+        let postsArray = []
+      
+        snapshot.forEach(doc => {
+          let post = doc.data()
+          post.id = doc.id
+      
+          postsArray.push(post)
+        })
+      
+        commit('setPosts', postsArray)
+      })
+    },
+    fetchUsers({ commit }) {
+      fb.usersCollection.onSnapshot(snapshot => {
+        let usersArray = [];
+      
+        snapshot.forEach(doc => {
+          let user = doc.data()
+          user.id = doc.id
+      
+          usersArray.push(user)
+        })
+      
+        commit('setUsers', usersArray)
+      })
+    },
     async login({ commit, dispatch }, form) {
     commit('setError', null)
      await fb.auth.signInWithEmailAndPassword(form.email, form.password)
